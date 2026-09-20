@@ -23,8 +23,8 @@ For at least 4 of my 5 test questions, the retrieved chunks include one that
 contains the answer.
 
 **Why this target:**
-<!-- e.g. "One of my questions is about a topic only two documents mention, so
-     I expect that one to be hard." -->
+
+My 5 test questions come from different advice threads and each has a specific answer in the corpus. I chose 4 of out 5 because retrieval may miss one question depending on how the documents are chunked or how similar the question is to the stored text.
 
 ---
 
@@ -33,8 +33,8 @@ contains the answer.
 Every answer the system produces names at least one source document.
 
 **Why this target:**
-<!-- Why all five and not four? What about your setup makes that achievable —
-     or what would have to go wrong for it not to be? -->
+
+The purpose of this system is to answer questions only using the given information from the advice_threads corpus. Thus, every answer produced by the system should have at least source document.
 
 ---
 
@@ -50,48 +50,29 @@ in at least 4 of 5 tries.
      just keep five of them, or the "4 of 5" above has nothing to be 4 of. -->
 
 **Why this target:**
-<!-- What did your distances look like when you set the cutoff in Milestone 4?
-     Was there a clean gap, or did the two groups overlap? -->
+
+The advice_threads corpus contains 23 documents and covers variety of student topics. A few words from the OUT_OF_SCOPE questions could have been similar to the ones inside the documents or slightly similar meaning to a stored chunk. I chose 4 out of 5 becuase I want the relevance gate to reject most unsuppored questions while allowing for one borderline retrieval result.
 
 ---
 
 ## 4. Something about your chunks
 
-<!-- YOU WRITE THIS ONE.
-
-     How would you know if your chunks were the right size? Name something
-     countable or observable.
-
-     Examples of the right shape — don't copy these, they should come from
-     what you actually saw in Milestone 3:
-       - "At least 4 of 5 sampled chunks read as a complete thought, with no
-          sentence cut in half at either end."
-       - "No chunk is shorter than 200 characters, since anything below that
-          in my corpus turned out to be a heading with no content under it." -->
-
-
+When inspecting 5 sampled chunks, at least 4 of them should contain complete replies or compte thoughts
+and should not start or end in the middle of a word or a sentence.
 
 **Why this target:**
 
-
+The chunker sometimes cuts some advice replies in the middle of sentences or words. Since each advice thread contains short replies, I want the most retrieved chunks to preserve enough of a reply to make sense on its own.
 
 ---
 
 ## 5. Your choice
 
-<!-- YOU WRITE THIS ONE TOO.
-
-     Pick something you actually care about getting right. It could be about
-     speed, about refusals, about a particular kind of question your corpus
-     handles badly, about source attribution being correct rather than merely
-     present — anything, as long as it names a number or an observable
-     outcome. -->
-
-
+For at least 4 out of my 5 test questions, the source named in the answer should actually contain the information used to answer the question.
 
 **Why this target:**
 
-
+Retrieval can return multiple documents for one question, including documents that are not relevant at all. I chose 4 out of 5 test questions because I want the system to cite the actual document that supports the answer.
 
 ---
 
