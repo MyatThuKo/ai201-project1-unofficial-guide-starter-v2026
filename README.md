@@ -29,8 +29,8 @@
 
 ## Chunking Strategy
 
-**Chunk size:**
-**Overlap:**
+**Chunk size:** Question with one complete reply instead of a fixed character limit
+**Overlap:** No character limit or overlap is needed since I prepend the question in every chunk before adding an answer.
 
 <!-- What about YOUR documents made you pick these numbers? Short posts and
      long sectioned guides don't want the same chunking, and "800 seemed
@@ -41,6 +41,8 @@
      more than pretending you got it right first time.
 
      Milestone 3. -->
+
+When I was reading `advice_threads`, I noticed that each document contains a question followed by multiple replies separated by blank lines. Thus, I decided to chunk around those blank lines instead of using fixed character limits. Each chunk will keep the question together with a complete replied answer. This will give the retrieved text both context and a complete thought.
 
 ## Sample Chunks
 
@@ -53,29 +55,49 @@
 
      Milestone 3. -->
 
-**Chunk 1** — source: `` — produced by: ``
+**Chunk 1** — source: thread_bike_commute.txt#0 `— produced by:` chunker.py::split_documents
 
 ```
+THREAD: Is a bike worth it for a 20 minute walk commute?
+
+--- reply 1 (14 votes) ---
+Yeah. Cuts an 18 minute walk to about 6. The thing nobody mentions is storage — covered bike parking exists at three buildings and is full by 9am at all three.
 ```
 
-**Chunk 2** — source: `` — produced by: ``
+**Chunk 2** — source: thread_first_gen.txt#1 `— produced by:` chunker.py::split_documents
 
 ```
+THREAD: Anything specific for first-generation students?
+
+--- reply 2 (41 votes) ---
+The thing I'd say: the unwritten rules are the hard part, not the coursework. Ask about the unwritten rules explicitly. People are happy to explain them and nobody volunteers them.
 ```
 
-**Chunk 3** — source: `` — produced by: ``
+**Chunk 3** — source: thread_laptop_specs.txt#2 `— produced by:` chunker.py::split_documents
 
 ```
+THREAD: How much laptop do I actually need for CS courses?
+
+--- reply 3 (12 votes) ---
+I did two years on an 8GB machine and it was fine until the last project, at which point it very much wasn't. 16 is the answer.
 ```
 
-**Chunk 4** — source: `` — produced by: ``
+**Chunk 4** — source: thread_parking.txt#1 `— produced by:` chunker.py::split_documents
 
 ```
+THREAD: Worth getting a parking permit?
+
+--- reply 2 (21 votes) ---
+Street parking on Verrill is legal and free and unmarked, which is why half the upper years do it.
 ```
 
-**Chunk 5** — source: `` — produced by: ``
+**Chunk 5** — source: thread_sleep_schedule.txt#1 `— produced by:` chunker.py::split_documents
 
 ```
+THREAD: Everyone says fix your sleep. Does it actually matter?
+
+--- reply 2 (37 votes) ---
+The library being open until 2am is a trap. It's a resource, not a schedule.
 ```
 
 ## Sample Answer
