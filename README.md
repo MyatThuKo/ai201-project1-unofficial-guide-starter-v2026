@@ -21,11 +21,7 @@
 
 ## What This Does
 
-<!-- Three or four sentences. Which corpus you picked, and the kinds of
-     questions your system answers. Write it for someone who has never seen
-     this repo.
-
-     Milestone 5. -->
+I used `advice_threads` corpus to build an unofficial guide that answers questions. The corpus contains a thread with questions, followed by multiple answers replied about topics such as commuting, internships and meal plans. The system splits the documents into searchable chunks, creates embeddings, and retrieves chunks that are relevant to a user's question. A relevance gate stops questions that are not covered by the `advice_threads` corpus, and the model generates a grounded answer using only the retrieved documents while naming its source.
 
 ## Chunking Strategy
 
@@ -147,16 +143,7 @@ I kept the relevance cutoff at 0.6 because my 5 sample questions had best distan
 
 ## How I Used AI
 
-<!-- Two specific moments. For each: what you asked for, what came back, and
-     what you changed about it.
-
-     "I asked Claude to write the chunking function from my notes. It ignored
-     the overlap, so I added that myself" is the level of detail we're after.
-     "I used AI to help me code" is not.
-
-     Milestone 5. -->
-
-**1.**
+**1.** I asked Claude to help me understand why the stater chunker was producing incomplete chunks. It explained that changing the character limit alone would not solve the problem because the fixed-size splitter was cutting through words and replies. I originally considered splitting on newline characters `\n`, then changed my implementation to use the blank-line structure of the `advice_threads` corpus. This way the chunk keeps the thread question with a complete reply.
 
 **2.**
 
