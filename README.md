@@ -106,13 +106,22 @@ The library being open until 2am is a trap. It's a resource, not a schedule.
      visible. Milestone 4. -->
 
 **Question:**
-
+"How much does it cost to rent a locker in the commuter lounge for a year?"
 **Answer:**
 
 ```
+(best distance 0.279, cutoff 0.6)
+
+It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).
+
+Sources retrieved: thread_bike_commute.txt, thread_commuting.txt, thread_laundry_timing.txt, thread_study_spots.txt
+
+1 model calls this session, 483 tokens (460 in, 23 out)
 ```
 
-**My relevance cutoff:**
+**My relevance cutoff:** 0.6
+
+I kept the relevance cutoff at 0.6 because my 5 sample questions had best distances between 0.239 and 0.279. For the `OUT_OF_SCOPE` questions, the distances are between 0.807 and 0.896. Since there was a large gap between the two groups (0.279 and 0.807), I decided to keep the relevance cutoff as 0.6 without changing it to allow the supported questions while rejecting the unsupported ones.
 
 <!-- The number you set in config.py, and how you got there.
 
@@ -123,9 +132,18 @@ The library being open until 2am is a trap. It's a resource, not a schedule.
 
      Milestone 4. -->
 
-| Question | In corpus? | Best distance |
-|---|---|---|
-|  |  |  |
+| Question                                                                          | In corpus? | Best distance |
+| --------------------------------------------------------------------------------- | ---------- | ------------- |
+| How much does it cost to rent a locker in the commuter lounge for a year?         | Yes        | 0.279         |
+| What is the memory size or RAM recommended for CS courses?                        | Yes        | 0.243         |
+| When is the latest time a student can apply for an internship at large employers? | Yes        | 0.239         |
+| What time is the best to do laundry in the dorms?                                 | Yes        | 0.275         |
+| How long do I have to change my meal plan?                                        | Yes        | 0.240         |
+| What is the capital of Mongolia?                                                  | No         | 0.893         |
+| How do I change the oil in a diesel engine?                                       | No         | 0.896         |
+| Who won the 1994 World Cup?                                                       | No         | 0.893         |
+| What is the recommended dosage of ibuprofen for a headache?                       | No         | 0.807         |
+| How do I write a for loop in Rust?                                                | No         | 0.835         |
 
 ## How I Used AI
 
