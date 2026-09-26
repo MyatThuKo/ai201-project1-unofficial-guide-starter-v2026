@@ -201,13 +201,13 @@ of changing it.
 
      Milestone 2. -->
 
-| # | Criterion | Verdict | How I decided |
-|---|---|---|---|
-| 1 |  |  |  |
-| 2 |  |  |  |
-| 3 |  |  |  |
-| 4 |  |  |  |
-| 5 |  |  |  |
+| #   | Criterion                                | Verdict | How I decided                                                                                                                      |
+| --- | ---------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Retrieved chunk contains the answer      | MET     | All 5 test questions retrieved at least one chunk containing the expected answer, exceeding my 4 of 5 target.                      |
+| 2   | Every answer names a source              | MET     | All 5 answers named at least one source document in every run, meeting my 5 of 5 target.                                           |
+| 3   | Gate stops out-of-corpus questions       | MET     | The relevance gate refused all 5 out-of-scope questions, exceeding my 4 of 5 target.                                               |
+| 4   | Sampled chunks contain complete thoughts | MET     | All 5 sampled chunks contained complete replies or complete thoughts and did not begin or end in the middle of a word or sentence. |
+| 5   | Cited source supports the answer         | MET     | For all 5 test questions, the cited source contained the expected information used in the answer, exceeding my 4 of 5 target.      |
 
 ## Diagnoses
 
