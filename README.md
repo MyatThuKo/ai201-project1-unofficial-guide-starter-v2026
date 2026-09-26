@@ -229,6 +229,18 @@ of changing it.
 
      Milestone 3. -->
 
+None of my five acceptance criteria were missed in the baseline run.
+
+However, Criterion 4 was less strict than it could have been. My original
+target only checked 4 of 5 sampled chunks, while my corpus contains 75 chunks.
+The `chunks -n 5` command also returned the same deterministic five chunks each
+time, so the criterion did not test much of the corpus.
+
+I ran `chunk_is_clean()` against all 75 chunks and found that 75 of 75 passed.
+This means the chunking implementation is working well, but if I were defining
+the criterion again, I would require all generated chunks to pass the
+clean-chunk check instead of only 4 of 5 sampled chunks.
+
 ## The Improvement
 
 **What I changed:**
