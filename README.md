@@ -145,7 +145,13 @@ I kept the relevance cutoff at 0.6 because my 5 sample questions had best distan
 
 **1.** I asked Claude to help me understand why the stater chunker was producing incomplete chunks. It explained that changing the character limit alone would not solve the problem because the fixed-size splitter was cutting through words and replies. I originally considered splitting on newline characters `\n`, then changed my implementation to use the blank-line structure of the `advice_threads` corpus. This way the chunk keeps the thread question with a complete reply.
 
-**2.**
+**2.** I asked Claude to help me interpret the retrieval distances when I was
+setting the relevance cutoff. It suggested comparing the five in-corpus
+questions against the five out-of-scope questions instead of changing the
+cutoff just because one earlier question failed. After changing my chunking
+strategy, my in-corpus distances were about 0.239–0.279 and my out-of-scope
+distances were about 0.807–0.896, so I kept the existing cutoff of 0.6 instead
+of changing it.
 
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
@@ -172,13 +178,13 @@ I kept the relevance cutoff at 0.6 because my 5 sample questions had best distan
 
      Milestone 1. -->
 
-| Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
-|---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| Criterion                                   | Target | Run 1  | Run 2  | Run 3  | Verdict |
+| ------------------------------------------- | ------ | ------ | ------ | ------ | ------- |
+| 1. Retrieved chunk contains the answer      | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET     |
+| 2. Every answer names a source              | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET     |
+| 3. Gate stops out-of-corpus questions       | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET     |
+| 4. Sampled chunks contain complete thoughts | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET     |
+| 5. Cited source supports the answer         | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET     |
 
 <!-- Underneath, paste the REAL output for each criterion from one of your
      runs — the actual text your system produced, not a description of it.
