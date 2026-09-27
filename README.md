@@ -160,6 +160,10 @@ of changing it.
      claims earns nothing.
      ───────────────────────────────────────────────────────────────────────── -->
 
+### Stretch Improvement
+
+For the extra-credit experiment, I will reduce `top_k` from 5 to 3. My current retrieval returns the correct source but often includes unrelated chunks as well. I want to test whether retrieving fewer chunks keeps all five questions correct while reducing unnecessary context.
+
 ---
 
 # Unit 2
