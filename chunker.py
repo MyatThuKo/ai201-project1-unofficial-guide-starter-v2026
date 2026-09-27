@@ -134,6 +134,11 @@ def split_documents(documents: list[Document]) -> list[Chunk]:
                 )
             )
 
+        # Milestone 4 improvement:
+        # validate every chunk before it leaves the chunking stage.
+        for chunk in chunks:
+            validate_chunk(chunk)
+
     return chunks
 
 
@@ -149,6 +154,24 @@ def describe(chunks: list[Chunk]) -> str:
         f"produced by {chunks[0].produced_by}"
     )
 
+def validate_chunk(chunk: Chunk) -> None:
+    """Validate that an advice_threads chunk has the expected structure."""
+    text = chunk.text.strip()
+
+    if not text.startswith("THREAD:"):
+        raise ValueError(
+            f"{chunk.label} is missing the THREAD header"
+        )
+
+    if "\n\n--- reply " not in text:
+        raise ValueError(
+            f"{chunk.label} is missing a reply block"
+        )
+
+    if not text.endswith((".", "!", "?", '"', "'", ")")):
+        raise ValueError(
+            f"{chunk.label} appears to end mid-thought"
+        )
 
 if __name__ == "__main__":
     from ingest import load_documents

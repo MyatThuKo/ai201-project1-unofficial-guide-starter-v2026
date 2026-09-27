@@ -1,6 +1,6 @@
 # The Unofficial Guide
 
-<!-- Replace this line with your name and which corpus you picked. -->
+**Myat Thu Ko — Corpus: `advice_threads`**
 
 > **This file is your submission.** Fill it in as you go — most sections get
 > written during the milestone that produces them, not at the end.
@@ -190,6 +190,60 @@ of changing it.
      runs — the actual text your system produced, not a description of it.
      Name the file and function that produced it. -->
 
+### Evidence from the before run
+
+- Produced by: `run_eval.py::main`
+- Retrieval: `store.py::search`, chunks from `chunker.py::split_documents`
+- Corpus: `advice_threads` (index variant `default`)
+- top-k: 5 · relevance cutoff: 0.6
+- Runs per question: 3, caching off
+- When: 2026-09-26 18:03
+
+### How much does it cost to rent a locker in the commuter lounge for a year? — run 1
+
+- Best distance: 0.2786 (passed the gate)
+- Sources retrieved: thread_bike_commute.txt, thread_commuting.txt, thread_laundry_timing.txt, thread_study_spots.txt
+
+```
+It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).
+```
+
+### How much does it cost to rent a locker in the commuter lounge for a year? — run 2
+
+- Best distance: 0.2786 (passed the gate)
+- Sources retrieved: thread_bike_commute.txt, thread_commuting.txt, thread_laundry_timing.txt, thread_study_spots.txt
+
+```
+It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).
+```
+
+### How much does it cost to rent a locker in the commuter lounge for a year? — run 3
+
+- Best distance: 0.2786 (passed the gate)
+- Sources retrieved: thread_bike_commute.txt, thread_commuting.txt, thread_laundry_timing.txt, thread_study_spots.txt
+
+```
+It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).
+```
+
+#### Criterion 3 evidence:
+
+Produced by `run_eval.py::check_out_of_scope`, cutoff 0.6. Refused 5 of 5.
+
+Retrieval is deterministic and the gate is a comparison against a
+fixed number, so these do not vary between runs — one pass over the
+list is the whole measurement.
+
+| Out-of-scope question                                       | Best distance | Gate    |
+| ----------------------------------------------------------- | ------------- | ------- |
+| What is the capital of Mongolia?                            | 0.893         | refused |
+| How do I change the oil in a diesel engine?                 | 0.896         | refused |
+| Who won the 1994 World Cup?                                 | 0.893         | refused |
+| What is the recommended dosage of ibuprofen for a headache? | 0.807         | refused |
+| How do I write a for loop in Rust?                          | 0.835         | refused |
+
+---
+
 ## Verdicts
 
 <!-- MET or MISSED for each of the five, against the target you wrote last
@@ -244,24 +298,27 @@ clean-chunk check instead of only 4 of 5 sampled chunks.
 ## The Improvement
 
 **What I changed:**
+I added extra check on my chunking strategy to make sure that every generated chunk is checked for the expected `advice_threads` structure before it is returned. I decided that a chunk must preserve the `THREAD:` question and a reply block instead of silently accepting mismatched text or an incorrect text.
 
 **Why I picked it:**
 
 <!-- Connect it to a specific diagnosis above in one sentence. If you can't,
      you picked a fix because it sounded impressive. -->
 
+The reason why I picked it because my Milestone 3 diagonsis showed that criterion #4 only checked 5 sampled chunks even though my selected `advice_threads` corpus produced 75 chunks in total. All 75 of those chunks happened to be clean, but the current chunker depends on the corpus keeping the same question-and-reply format. If the corpus format changes, the validator will now raise an error instead of allowing malformed chunks to pass silently into the pipeline.
+
 ### Run Log — After
 
 <!-- Same format, same five criteria, three runs each.
      `python run_eval.py --label after` -->
 
-| Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
-|---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| Criterion                                   | Target | Run 1  | Run 2  | Run 3  | Verdict |
+| ------------------------------------------- | ------ | ------ | ------ | ------ | ------- |
+| 1. Retrieved chunk contains the answer      | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET     |
+| 2. Every answer names a source              | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET     |
+| 3. Gate stops out-of-corpus questions       | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET     |
+| 4. Sampled chunks contain complete thoughts | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET     |
+| 5. Cited source supports the answer         | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET     |
 
 **Did it help?**
 
@@ -271,6 +328,10 @@ clean-chunk check instead of only 4 of 5 sampled chunks.
      tell.
 
      Milestone 4. -->
+
+The changes did not show an improvement in the scores since the baseline already met all five of the criteria I have written in Unit 1. Before the change, all five criteria scored 5 of 5 in all three runs. After the change, all five criteria still scored 5 of 5 in all three runs. Therefore, the improvement did not change the acceptance-criteria scores.
+
+However, the improvement made the chunking pipeline more robust. Before the change, malformed chunks could be returned silently if the `advice_threads` format changed from a `THREAD:` question followed by reply blocks to a different structure. After adding a new method `validate_chunk()` before returning the chunk in `split_documents()` method, every generated chunk is checked for the expected format of `THREAD:` header followed by replies with complete ending and meaningful sentence. I also made sure that all 75 chunks produced passed the validation and that chunk with an incorrect format raised a `ValueError`.
 
 ## What's Still Broken
 
