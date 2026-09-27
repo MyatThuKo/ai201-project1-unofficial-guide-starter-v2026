@@ -164,6 +164,20 @@ of changing it.
 
 For the extra-credit experiment, I will reduce `top_k` from 5 to 3. My current retrieval returns the correct source but often includes unrelated chunks as well. I want to test whether retrieving fewer chunks keeps all five questions correct while reducing unnecessary context.
 
+### Stretch Improvement (Unit 2) — Reduce top-k Finding
+
+I tested reducing `top_k` from 5 to 3 because my original retrieval often returned the correct document along with several unrelated documents.
+
+I ran: `python run_eval.py --top-k 3 --label stretch`
+
+All five in-corpus questions still passed in all three runs, and the relevance gate still refused all 5 out-of-scope questions.
+
+The number of unique retrieved source documents also decreased. Across my five test questions, the average dropped from 3.0 sources with `top_k = 5` to 1.4 sources with `top_k = 3`. Four of the five questions retrieved only the correct source document.
+
+**Did it help?**
+
+Yes. Reducing `top_k` did not change the acceptance-criteria scores, but it made retrieval more focused and reduced unrelated context without losing the supporting chunk.
+
 ---
 
 # Unit 2
