@@ -379,3 +379,13 @@ I stopped here because Unit 2 asks for one measured improvement, and changing th
 If I were writing my acceptance criteria again, I would make Criterion 4 morestrict. Instead of checking whether 4 of 5 sampled chunks contain complete thoughts, I would require every generated chunk to pass the clean-chunk check.
 
 My corpus produced 75 chunks, and `python app.py chunks -n 5` returned the same five deterministic samples each time. That meant my original criterion tested only a small portion of the corpus. When I later checked all 75 chunks with `chunk_is_clean()`, all 75 passed, so a full-corpus criterion would have been both measurable and more meaningful.
+
+### Run Log — Stretch
+
+| Criterion                                   | Target | Run 1  | Run 2  | Run 3  | Verdict |
+| ------------------------------------------- | ------ | ------ | ------ | ------ | ------- |
+| 1. Retrieved chunk contains the answer      | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET     |
+| 2. Every answer names a source              | 5 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET     |
+| 3. Gate stops out-of-corpus questions       | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET     |
+| 4. Sampled chunks contain complete thoughts | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET     |
+| 5. Cited source supports the answer         | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET     |
