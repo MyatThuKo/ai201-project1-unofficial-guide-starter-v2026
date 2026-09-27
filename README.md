@@ -153,6 +153,8 @@ strategy, my in-corpus distances were about 0.239–0.279 and my out-of-scope
 distances were about 0.807–0.896, so I kept the existing cutoff of 0.6 instead
 of changing it.
 
+**3.** In Unit 2, I asked Claude to help me interpret my baseline results after all five acceptance criteria passed. It suggested checking Criterion 4 across all 75 chunks instead of relying only on the five deterministic samples. After running that check, I found that all 75 chunks were clean. That changed my understanding of the issue: the chunker itself was working, but my original acceptance criterion was too weak. I then added `validate_chunk()` as a defensive check rather than rewriting the chunking strategy.
+
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
      claims earns nothing.
@@ -343,9 +345,19 @@ However, the improvement made the chunking pipeline more robust. Before the chan
 
      Milestone 5. -->
 
+None of my five acceptance criteria are still missed after the improvement.
+
+However, the chunking strategy is still tightly coupled to the structure of the `advice_threads` corpus. It expects each document to begin with a `THREAD:` question followed by reply blocks separated by blank lines. The new validation step will catch malformed chunks if that structure changes, but the chunker itself would still need to be updated to support a different document format.
+
+I stopped here because Unit 2 asks for one measured improvement, and changing the chunking strategy again would introduce a second system change.
+
 ## What I'd Do Differently
 
 <!-- Knowing what you know now — which of your five criteria would you write
      differently, and why?
 
      Milestone 5. -->
+
+If I were writing my acceptance criteria again, I would make Criterion 4 morestrict. Instead of checking whether 4 of 5 sampled chunks contain complete thoughts, I would require every generated chunk to pass the clean-chunk check.
+
+My corpus produced 75 chunks, and `python app.py chunks -n 5` returned the same five deterministic samples each time. That meant my original criterion tested only a small portion of the corpus. When I later checked all 75 chunks with `chunk_is_clean()`, all 75 passed, so a full-corpus criterion would have been both measurable and more meaningful.
