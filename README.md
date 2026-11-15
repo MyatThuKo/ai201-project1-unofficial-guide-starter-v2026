@@ -389,3 +389,25 @@ My corpus produced 75 chunks, and `python app.py chunks -n 5` returned the same 
 | 3. Gate stops out-of-corpus questions       | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET     |
 | 4. Sampled chunks contain complete thoughts | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET     |
 | 5. Cited source supports the answer         | 4 of 5 | 5 of 5 | 5 of 5 | 5 of 5 | MET     |
+
+## Capstone
+
+**The System**
+
+I chose to extend The Unofficial Guide, my RAG-based question-answering system from Units 1–2. The system retrieves relevant information from the `advice_threads` corpus, checks whether the question is supported by the retrieved documents, and generates an answer grounded in those documents.
+
+**The Shape**
+
+I chose Shape A — Deploy and Instrument, using Path B — Local with Logs.
+
+I will extend the existing HTTP service in `serve.py` by adding structured JSONL logging and request execution-time measurement. Each request will produce a record containing its timestamp, request outcome, HTTP status, execution duration, and relevant metadata. Both successful and failed requests will be recorded.
+
+The service will run locally using a documented command, and the logs will provide evidence of its behavior. I will measure the average execution time across multiple requests and use the results to evaluate the extension.
+
+**Out of Scope**
+
+- I will not modify the existing chunking strategy, embedding model, or retrieval logic.
+- I will not change the relevance threshold, Gemini model, or grounded-answer generation.
+- I will not build a frontend, monitoring dashboard, or external database.
+
+The goal is to make the existing system observable and reproducible, not to change how it answers questions.
