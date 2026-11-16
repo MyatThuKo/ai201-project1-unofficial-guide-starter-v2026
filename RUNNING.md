@@ -76,40 +76,40 @@ switching corpora.**
 
 ## Every command
 
-| Command | What it does |
-|---|---|
-| `python test.py` | Checks your environment. Run it whenever something feels off |
-| `python app.py corpora` | Lists the provided corpora with a one-line description |
-| `python app.py index` | Loads, chunks, embeds and stores your corpus. Run after any change to chunking |
-| `python app.py ask "question"` | Asks one question, end to end |
-| `python app.py ask` | Keeps asking until you press Enter on an empty line |
-| `python app.py chunks` | Prints sample chunks — **Milestone 3** |
-| `python app.py retrieve "question"` | Shows distances without spending a model call — **Milestone 4** |
+| Command                             | What it does                                                                                                                 |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `python test.py`                    | Checks your environment. Run it whenever something feels off                                                                 |
+| `python app.py corpora`             | Lists the provided corpora with a one-line description                                                                       |
+| `python app.py index`               | Loads, chunks, embeds and stores your corpus. Run after any change to chunking                                               |
+| `python app.py ask "question"`      | Asks one question, end to end                                                                                                |
+| `python app.py ask`                 | Keeps asking until you press Enter on an empty line                                                                          |
+| `python app.py chunks`              | Prints sample chunks — **Milestone 3**                                                                                       |
+| `python app.py retrieve "question"` | Shows distances without spending a model call — **Milestone 4**                                                              |
 | `python run_eval.py --label before` | Runs every test question three times, puts every `OUT_OF_SCOPE` question through the gate, and writes a run log — **unit 2** |
 
 Useful flags:
 
-| Flag | Works on | What it does |
-|---|---|---|
-| `--corpus NAME` | all | Use a different corpus without editing `config.py` |
-| `--variant NAME` | `index`, `ask`, `retrieve` | Keep two different indexes of the same corpus side by side |
-| `-n 5` | `chunks` | How many chunks to print |
-| `--top-k 8` | `ask`, `retrieve` | Retrieve more or fewer chunks |
-| `--threshold 0.7` | `ask` | Try a different relevance cutoff without editing `config.py` |
-| `--label before` | `run_eval.py` | Names the output file, so before and after are distinguishable |
+| Flag              | Works on                   | What it does                                                   |
+| ----------------- | -------------------------- | -------------------------------------------------------------- |
+| `--corpus NAME`   | all                        | Use a different corpus without editing `config.py`             |
+| `--variant NAME`  | `index`, `ask`, `retrieve` | Keep two different indexes of the same corpus side by side     |
+| `-n 5`            | `chunks`                   | How many chunks to print                                       |
+| `--top-k 8`       | `ask`, `retrieve`          | Retrieve more or fewer chunks                                  |
+| `--threshold 0.7` | `ask`                      | Try a different relevance cutoff without editing `config.py`   |
+| `--label before`  | `run_eval.py`              | Names the output file, so before and after are distinguishable |
 
 ---
 
 ## Which command goes with which milestone
 
-| Milestone | What you're doing | Command |
-|---|---|---|
-| 1 | Pick a corpus and see it work | `app.py corpora`, `app.py index`, `app.py ask "..."` |
-| 2 | Write your acceptance criteria | Edit `criteria.md` and `questions.py` |
-| 3 | Swap in your own chunker | Edit `chunker.py`, then `app.py index` and `app.py chunks` |
-| 4 | Tune retrieval, set your cutoff | `app.py retrieve "..."`, then edit `THRESHOLD` in `config.py` |
-| 5 | Write it up | Fill in `README.md` |
-| Unit 2 | Run the test, fix one thing, re-run | `run_eval.py --label before` … `run_eval.py --label after` |
+| Milestone | What you're doing                   | Command                                                       |
+| --------- | ----------------------------------- | ------------------------------------------------------------- |
+| 1         | Pick a corpus and see it work       | `app.py corpora`, `app.py index`, `app.py ask "..."`          |
+| 2         | Write your acceptance criteria      | Edit `criteria.md` and `questions.py`                         |
+| 3         | Swap in your own chunker            | Edit `chunker.py`, then `app.py index` and `app.py chunks`    |
+| 4         | Tune retrieval, set your cutoff     | `app.py retrieve "..."`, then edit `THRESHOLD` in `config.py` |
+| 5         | Write it up                         | Fill in `README.md`                                           |
+| Unit 2    | Run the test, fix one thing, re-run | `run_eval.py --label before` … `run_eval.py --label after`    |
 
 `app.py chunks` prints each chunk with its **source file and the function that
 produced it** — both of which your README has to name. Copy them straight
@@ -127,22 +127,22 @@ number — three passes would produce the same three answers.
 
 ## Where everything lives
 
-| File | What it does |
-|---|---|
-| `config.py` | Every setting worth changing: chunk size, overlap, top-k, the relevance cutoff |
-| `ingest.py` | Loads documents off disk and cleans them — **stage 1** |
-| `chunker.py` | Splits documents into chunks — **stage 2, and the file you replace in Milestone 3** |
-| `store.py` | Embeds chunks, stores them, retrieves them with distances — **stages 3 and 4** |
-| `gate.py` | The relevance gate. Refuses questions nothing came back close enough for |
-| `generate.py` | Writes the answer — **stage 5**. The only thing that calls out to a service |
-| `app.py` | The command line |
-| `serve.py` | The same pipeline behind HTTP, for when it has to run as a service — **unit 9** |
-| `run_eval.py` | Runs your questions repeatedly and writes the run log |
+| File           | What it does                                                                                                     |
+| -------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `config.py`    | Every setting worth changing: chunk size, overlap, top-k, the relevance cutoff                                   |
+| `ingest.py`    | Loads documents off disk and cleans them — **stage 1**                                                           |
+| `chunker.py`   | Splits documents into chunks — **stage 2, and the file you replace in Milestone 3**                              |
+| `store.py`     | Embeds chunks, stores them, retrieves them with distances — **stages 3 and 4**                                   |
+| `gate.py`      | The relevance gate. Refuses questions nothing came back close enough for                                         |
+| `generate.py`  | Writes the answer — **stage 5**. The only thing that calls out to a service                                      |
+| `app.py`       | The command line                                                                                                 |
+| `serve.py`     | The same pipeline behind HTTP, for when it has to run as a service — **unit 9**                                  |
+| `run_eval.py`  | Runs your questions repeatedly and writes the run log                                                            |
 | `questions.py` | Your five test questions, and the five out-of-corpus ones the gate should refuse. **You fill in the first five** |
-| `criteria.md` | Your five acceptance criteria. **You fill this in** |
-| `README.md` | Your submission |
-| `corpora/` | The provided documents, and `corpora/README.md` describing each |
-| `results/` | Run logs, written by `run_eval.py`. **Commit these** — they're your evidence |
+| `criteria.md`  | Your five acceptance criteria. **You fill this in**                                                              |
+| `README.md`    | Your submission                                                                                                  |
+| `corpora/`     | The provided documents, and `corpora/README.md` describing each                                                  |
+| `results/`     | Run logs, written by `run_eval.py`. **Commit these** — they're your evidence                                     |
 
 The five stages matter more than they look. In unit 2 you diagnose each failure
 by naming which stage caused it, so it's worth knowing now which file is which.
@@ -175,16 +175,16 @@ broken key. Wait a minute and re-run.
 
 ## When something goes wrong
 
-| What you see | What it means |
-|---|---|
-| `No index called '...'. Run python app.py index first.` | You haven't indexed, or you switched corpus without re-indexing |
-| `No GEMINI_API_KEY found` | No `.env` file, or the key wasn't pasted in. On Windows check it didn't save as `.env.txt` |
-| `No corpus at ...` | The corpus name is wrong. `python app.py corpora` lists the real ones |
-| The system refuses everything | Your cutoff is too low for this corpus. Try `--threshold 0.75` to confirm, then set it properly in Milestone 4 |
-| The system never refuses anything | Your cutoff is too high. Same process in reverse |
-| `[rate limit] ... Waiting 34s` | Working as intended. Leave it |
-| `QuotaGuard: This session has made 300 requests` | A loop is running away. Find it before raising the budget |
-| Indexing is very slow | Expected on the first run — it's downloading the embedding model. Later runs are much faster |
+| What you see                                            | What it means                                                                                                  |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `No index called '...'. Run python app.py index first.` | You haven't indexed, or you switched corpus without re-indexing                                                |
+| `No GEMINI_API_KEY found`                               | No `.env` file, or the key wasn't pasted in. On Windows check it didn't save as `.env.txt`                     |
+| `No corpus at ...`                                      | The corpus name is wrong. `python app.py corpora` lists the real ones                                          |
+| The system refuses everything                           | Your cutoff is too low for this corpus. Try `--threshold 0.75` to confirm, then set it properly in Milestone 4 |
+| The system never refuses anything                       | Your cutoff is too high. Same process in reverse                                                               |
+| `[rate limit] ... Waiting 34s`                          | Working as intended. Leave it                                                                                  |
+| `QuotaGuard: This session has made 300 requests`        | A loop is running away. Find it before raising the budget                                                      |
+| Indexing is very slow                                   | Expected on the first run — it's downloading the embedding model. Later runs are much faster                   |
 
 Still stuck after one honest attempt? Post in the help channel with the full
 error, what you ran, and what you expected. You are not expected to debug your
@@ -202,16 +202,16 @@ table now.
 stays up instead of a command that exits.
 
 ```bash
-python serve.py                    # locally, on port 5000
+python serve.py                    # locally, on port 5001
 gunicorn serve:app                 # the way a host starts it
 ```
 
-| Thing | What it does |
-|---|---|
-| `POST /ask` | Send `{"question": "..."}`, get the answer and its sources back as JSON |
-| `GET /health` | Says whether the service is up and whether an index exists to search |
-| `PORT` | The port to listen on. Hosts set it for you; on your laptop it defaults to 5000 |
-| `AI201_DEBUG=1` | Flask's reloader and debugger. Local only — never set it on a deployed service |
+| Thing           | What it does                                                                    |
+| --------------- | ------------------------------------------------------------------------------- |
+| `POST /ask`     | Send `{"question": "..."}`, get the answer and its sources back as JSON         |
+| `GET /health`   | Says whether the service is up and whether an index exists to search            |
+| `PORT`          | The port to listen on. Hosts set it for you; on your laptop it defaults to 5001 |
+| `AI201_DEBUG=1` | Flask's reloader and debugger. Local only — never set it on a deployed service  |
 
 > The free hosting tier sleeps after about fifteen minutes with no traffic, so
 > the first request after a quiet spell waits roughly a minute for it to wake
@@ -280,20 +280,36 @@ a key nor an index**. Steps 3 and 4 below create them.
 
 ## From a clean checkout
 
+> The code blocks below have **no `#` comments in them** on purpose. macOS's
+> default shell (zsh) does not treat `#` as a comment when you paste commands,
+> so an inline comment gets passed to the command as extra arguments. This was
+> found by testing these instructions from a fresh clone.
+
+**1. Get the code**
+
 ```bash
-# 1. Get the code
 git clone <repository-url> unofficial-guide
 cd unofficial-guide
+```
 
-# 2. Create the environment and install the pinned dependencies
+**2. Create the environment and install the pinned dependencies**
+
+```bash
 python3.13 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
+```
 
-# 3. Add your key: copy the template, then paste your key into .env
+**3. Add your key.** Copy the template, then open `.env` and paste your key
+after `GEMINI_API_KEY=`.
+
+```bash
 cp .env.example .env
+```
 
-# 4. Build the index (first run also downloads the 166 MB embedding model)
+**4. Build the index.** The first run also downloads the 166 MB embedding model.
+
+```bash
 python app.py index
 ```
 
@@ -316,9 +332,12 @@ It listens on **http://localhost:5001**.
 
 ```bash
 source .venv/bin/activate
+curl http://localhost:5001/health
+```
 
-curl http://localhost:5001/health          # expect "index_ready": true
+Expect `"index_ready": true`. Then ask one question:
 
+```bash
 curl -X POST http://localhost:5001/ask \
   -H "Content-Type: application/json" \
   -d '{"question": "Is the housing lottery random?"}'
@@ -326,14 +345,18 @@ curl -X POST http://localhost:5001/ask \
 
 ## Run a measured session
 
+With the server running in the first terminal, in the second:
+
 ```bash
-rm -f logs/requests.jsonl                  # start from an empty log
-python run_capstone_requests.py            # 12 questions + 2 bad requests
-python measure_cost.py                     # averages from the log
-cp logs/requests.jsonl results/capstone_m3_session.jsonl   # save as evidence
+rm -f logs/requests.jsonl
+python run_capstone_requests.py
+python measure_cost.py
+cp logs/requests.jsonl results/capstone_m3_session.jsonl
 ```
 
-`logs/` is in `.gitignore`; the copy in `results/` is the committed run record.
+In order: start from an empty log; send 12 questions plus 2 bad requests;
+print the averages from the log; save the session as evidence. `logs/` is in
+`.gitignore`, so the copy in `results/` is the committed run record.
 
 ## The structured log
 
