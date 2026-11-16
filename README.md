@@ -453,3 +453,41 @@ The session below was produced with `AI201_CACHE=0 python serve.py` and `python 
 - **The first request after start-up is slower** because it loads Chroma and the index. It's included in the average, as one of the ten.
 
 **In money:** the project runs on Gemini's free tier, so the actual spend was $0. The real cost is the tokens above, taken from the free tier's request and token quota.
+
+**Run Log and Verdicts — Before Improvement**
+
+The capstone was evaluated using `run_trials.py` with three separate trials. Answer caching was disabled, and the test runner sent paced HTTP requests against the locally running Flask service.
+
+| Criterion                 | Target     | Run 1                                                | Run 2                                                 | Run 3                                                | Verdict |
+| ------------------------- | ---------- | ---------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------- | ------- |
+| 1. Logging completeness   | 10/10      | 10/10                                                | 10/10                                                 | 10/10                                                | MET     |
+| 2. Warm-request latency   | <= 1000 ms | avg 659.0 ms over 10 warm requests (491.97 - 949.13) | avg 718.8 ms over 10 warm requests (535.33 - 1018.44) | avg 731.5 ms over 10 warm requests (500.58 — 957.27) | MET     |
+| 3. Failure observability  | 6/6        | 6/6                                                  | 6/6                                                   | 6/6                                                  | MET     |
+| 4. Reproducible execution | 5/5 steps  | 5/5                                                  | 5/5                                                   | 5/5                                                  | MET     |
+| 5. RAG behavior           | 8/8        | 8/8                                                  | 8/8                                                   | 8/8                                                  | MET     |
+
+**Evidence**
+
+The following files contain the complete HTTP responses, structured log records, and evaluation results:
+
+- `results/capstone_trial_1.json`
+- `results/capstone_trial_2.json`
+- `results/capstone_trial_3.json`
+
+Criterion 1 was evaluated by `criterion_1()` in `run_trials.py`, verifying structured log records and request metadata.
+
+Criterion 2 was evaluated by `criterion_2()`, which excluded the warm-up request and calculated average latency from ten measured requests per trial.
+
+Criterion 3 was evaluated by `criterion_3()`, using five invalid HTTP requests and one mocked `RuntimeError` per trial.
+
+Criterion 5 was evaluated by `criterion_5()`, which sent questions through `/ask` and used `scorer.judge()` with retrieved documents to check answer correctness and citations.
+
+**Observations**
+
+All four automated criteria met their acceptance targets across three trials.
+
+The mean warm-request latency across the three trials was approximately 703.1 ms, below the 1,000 ms target. However, individual requests in the separate structured-logging tests occasionally exceeded three or four seconds.
+
+This suggests that average latency alone does not fully describe response-time consistency.
+
+Criterion 4 remains pending until the three clean-checkout trials have been documented.
