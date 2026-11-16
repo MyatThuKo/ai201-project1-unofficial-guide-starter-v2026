@@ -191,6 +191,53 @@ def ask():
     )
 
 
+def warm_up() -> None:
+    """Load the pipeline's heavy dependencies before the first request arrives.
+
+    Milestone 6 fix. Everything below is otherwise created lazily, inside the
+    first /ask, so the first user after a start paid ~1.5 s extra (measured:
+    results/capstone_coldstart_before.json). Doing it here moves that cost to
+    start-up instead. Nothing about retrieval, the gate or generation changes —
+    this only calls the same functions earlier.
+
+    Makes no Gemini API call and writes nothing to the request log. A failure
+    here (no index, no API key) is reported and the server still starts, so
+    /health and /ask report the problem exactly as they did before this fix.
+    """
+    print("Warming up (loading index, embedding model and Gemini client)...")
+    total_start = time.perf_counter()
+
+    steps = []
+
+    def step(name, fn):
+        start = time.perf_counter()
+        try:
+            fn()
+            steps.append(f"{name} {(time.perf_counter() - start) * 1000:.0f} ms")
+        except Exception as exc:  # noqa: BLE001 — never block start-up
+            steps.append(f"{name} FAILED ({type(exc).__name__}: {exc})")
+
+    def load_pipeline():
+        from app import ask_pipeline  # noqa: F401 — the same import /ask does
+
+    def load_retrieval():
+        # One real search: opens the Chroma client and collection, and loads the
+        # ONNX embedding model (it only loads on the first thing it embeds).
+        from store import search
+
+        search("warm-up", corpus=config.CORPUS)
+
+    def load_gemini_client():
+        generate._get_client()  # creates the client; sends no request
+
+    step("pipeline import", load_pipeline)
+    step("retrieval + embedder", load_retrieval)
+    step("Gemini client", load_gemini_client)
+
+    total_ms = (time.perf_counter() - total_start) * 1000
+    print(f"Warm-up done in {total_ms:.0f} ms: " + "; ".join(steps) + "\n")
+
+
 def main():
     # Hosts tell you which port to listen on through PORT, and they expect you
     # on 0.0.0.0. Binding 127.0.0.1 instead works perfectly on your laptop and
@@ -206,6 +253,11 @@ def main():
     # runs arbitrary code, which is not something to leave switched on where
     # strangers can reach it. Off unless you ask for it.
     debug = os.getenv("AI201_DEBUG", "0") == "1"
+
+    # Load the heavy dependencies now so the first request doesn't pay for them.
+    # Only runs under `python serve.py` (the Path B run command); a host running
+    # `gunicorn serve:app` never calls main() and would still start cold.
+    warm_up()
 
     print(f"Serving The Unofficial Guide on http://localhost:{port}")
     print(f"Corpus: {config.CORPUS}    (Ctrl-C to stop)\n")

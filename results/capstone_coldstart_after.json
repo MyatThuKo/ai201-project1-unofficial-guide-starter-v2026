@@ -1,0 +1,134 @@
+{
+  "label": "after",
+  "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+  "first_request_ms": {
+    "values": [
+      568.75,
+      1009.92,
+      651.21
+    ],
+    "avg": 743.3,
+    "min": 568.75,
+    "max": 1009.92
+  },
+  "startup_ms": {
+    "values": [
+      2100.0,
+      1478.2,
+      1518.9
+    ],
+    "avg": 1699.0,
+    "min": 1478.2,
+    "max": 2100.0
+  },
+  "runs": [
+    {
+      "run": 1,
+      "startup_ms": 2100.0,
+      "first_request_ms": 568.75,
+      "client_round_trip_ms": 583.7,
+      "status": 200,
+      "outcome": "answered",
+      "cache_hit": false,
+      "prompt_tokens": 460,
+      "answer": "It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).",
+      "log_record": {
+        "timestamp": "2026-11-16T03:58:28.403705+00:00",
+        "request_id": "e24ed8aa-9036-4990-af5a-b0a7d44d3d5f",
+        "method": "POST",
+        "path": "/ask",
+        "http_status": 200,
+        "outcome": "answered",
+        "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+        "answer": "It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).",
+        "sources": [
+          "thread_bike_commute.txt",
+          "thread_commuting.txt",
+          "thread_laundry_timing.txt",
+          "thread_study_spots.txt"
+        ],
+        "n_sources": 4,
+        "best_distance": 0.2786,
+        "prompt_tokens": 460,
+        "output_tokens": 23,
+        "cache_hit": false,
+        "duration_ms": 568.75,
+        "question_length": 73,
+        "error_type": null,
+        "ts": "2026-11-16T03:58:28.403733+00:00"
+      }
+    },
+    {
+      "run": 2,
+      "startup_ms": 1478.2,
+      "first_request_ms": 1009.92,
+      "client_round_trip_ms": 1014.9,
+      "status": 200,
+      "outcome": "answered",
+      "cache_hit": false,
+      "prompt_tokens": 460,
+      "answer": "It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).",
+      "log_record": {
+        "timestamp": "2026-11-16T03:58:31.173576+00:00",
+        "request_id": "ef6c82a4-4431-4627-a8a4-960cb39aadf4",
+        "method": "POST",
+        "path": "/ask",
+        "http_status": 200,
+        "outcome": "answered",
+        "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+        "answer": "It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).",
+        "sources": [
+          "thread_bike_commute.txt",
+          "thread_commuting.txt",
+          "thread_laundry_timing.txt",
+          "thread_study_spots.txt"
+        ],
+        "n_sources": 4,
+        "best_distance": 0.2786,
+        "prompt_tokens": 460,
+        "output_tokens": 23,
+        "cache_hit": false,
+        "duration_ms": 1009.92,
+        "question_length": 73,
+        "error_type": null,
+        "ts": "2026-11-16T03:58:31.173645+00:00"
+      }
+    },
+    {
+      "run": 3,
+      "startup_ms": 1518.9,
+      "first_request_ms": 651.21,
+      "client_round_trip_ms": 654.4,
+      "status": 200,
+      "outcome": "answered",
+      "cache_hit": false,
+      "prompt_tokens": 460,
+      "answer": "It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).",
+      "log_record": {
+        "timestamp": "2026-11-16T03:58:33.628144+00:00",
+        "request_id": "39ac41d6-0dab-47a8-8202-002897e73d20",
+        "method": "POST",
+        "path": "/ask",
+        "http_status": 200,
+        "outcome": "answered",
+        "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+        "answer": "It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).",
+        "sources": [
+          "thread_bike_commute.txt",
+          "thread_commuting.txt",
+          "thread_laundry_timing.txt",
+          "thread_study_spots.txt"
+        ],
+        "n_sources": 4,
+        "best_distance": 0.2786,
+        "prompt_tokens": 460,
+        "output_tokens": 23,
+        "cache_hit": false,
+        "duration_ms": 651.21,
+        "question_length": 73,
+        "error_type": null,
+        "ts": "2026-11-16T03:58:33.628193+00:00"
+      }
+    }
+  ]
+}
