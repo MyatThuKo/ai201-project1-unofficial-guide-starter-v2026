@@ -468,26 +468,87 @@ The capstone was evaluated using `run_trials.py` with three separate trials. Ans
 
 **Evidence**
 
-The following files contain the complete HTTP responses, structured log records, and evaluation results:
+The complete HTTP responses, structured log records, and evaluation results for every trial are in:
 
-- `results/capstone_trial_1.json`
-- `results/capstone_trial_2.json`
-- `results/capstone_trial_3.json`
+- `results/capstone_trial_1.json`, `results/capstone_trial_2.json`, `results/capstone_trial_3.json` (criteria 1, 2, 3, 5)
+- `results/capstone_c4_trial_1.txt`, `results/capstone_c4_trial_2.txt`, `results/capstone_c4_trial_3.txt` (criterion 4)
 
-Criterion 1 was evaluated by `criterion_1()` in `run_trials.py`, verifying structured log records and request metadata.
+Real output for each criterion, all from **trial 1**:
 
-Criterion 2 was evaluated by `criterion_2()`, which excluded the warm-up request and calculated average latency from ten measured requests per trial.
+**Criterion 1: Structured logging completeness.** Produced by `run_trials.py::criterion_1()`. The log lines were written by `serve.py::record_request()` through `request_log.py::log_request()`. These are the first 2 of the 10 new records in `logs/requests.jsonl` (`criteria["1"]["log_records"]`):
 
-Criterion 3 was evaluated by `criterion_3()`, using five invalid HTTP requests and one mocked `RuntimeError` per trial.
+```json
+{"timestamp": "2026-11-16T02:43:50.496191+00:00", "request_id": "638336cb-017d-4bf4-99d5-b882f556481e", "method": "POST", "path": "/ask", "http_status": 200, "outcome": "answered", "question": "How much does it cost to rent a locker in the commuter lounge for a year?", "answer": "It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).", "sources": ["thread_bike_commute.txt", "thread_commuting.txt", "thread_laundry_timing.txt", "thread_study_spots.txt"], "n_sources": 4, "best_distance": 0.2786, "prompt_tokens": 460, "output_tokens": 23, "cache_hit": false, "duration_ms": 492.01, "question_length": 73, "error_type": null, "ts": "2026-11-16T02:43:50.496213+00:00"}
+{"timestamp": "2026-11-16T02:43:55.100002+00:00", "request_id": "6658767c-3930-4058-b372-2b62b0d230c7", "method": "POST", "path": "/ask", "http_status": 200, "outcome": "answered", "question": "What is the memory size or RAM recommended for a CS courses?", "answer": "16GB of RAM is recommended (or worth paying for) for CS courses (thread_laptop_specs.txt).", "sources": ["thread_first_year_regret.txt", "thread_laptop_specs.txt", "thread_pass_fail.txt"], "n_sources": 3, "best_distance": 0.243, "prompt_tokens": 459, "output_tokens": 25, "cache_hit": false, "duration_ms": 1597.69, "question_length": 60, "error_type": null, "ts": "2026-11-16T02:43:55.100024+00:00"}
+```
 
-Criterion 5 was evaluated by `criterion_5()`, which sent questions through `/ask` and used `scorer.judge()` with retrieved documents to check answer correctness and citations.
+All 10 records passed every check (no issues in `criteria["1"]["checks"]`).
+
+**Criterion 2: Warm-request latency.** Produced by `run_trials.py::criterion_2()` from the `duration_ms` field of the 11 new log records (`criteria["2"]`):
+
+```json
+{
+  "warmup": {
+    "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+    "status": 200,
+    "duration_ms": 2766.31
+  },
+  "durations_ms": [
+    624.79, 850.05, 949.13, 577.99, 792.19, 512.29, 556.81, 505.97, 491.97,
+    729.11
+  ],
+  "average_ms": 659.0,
+  "min_ms": 491.97,
+  "max_ms": 949.13,
+  "met": true
+}
+```
+
+**Criterion 3: Failure-path observability.** Produced by `run_trials.py::criterion_3()`. The five invalid requests went over HTTP and were matched to their log records by order. The 500 is the record the mocked `serve.log_request()` received (`criteria["3"]`):
+
+```json
+{"name": "Empty JSON object", "status": 400, "logged_status": 400, "logged_outcome": "bad_request", "request_id": "e2c6d0bf-7d62-4f12-b75b-ed486daad438", "pass": true}
+{"name": "Empty question", "status": 400, "logged_status": 400, "logged_outcome": "bad_request", "request_id": "55d41180-49f9-475e-825f-6251a8316b7e", "pass": true}
+{"name": "Whitespace-only question", "status": 400, "logged_status": 400, "logged_outcome": "bad_request", "request_id": "e16e13c9-62ff-49af-bf51-c152997cc8a2", "pass": true}
+{"name": "Null question", "status": 400, "logged_status": 400, "logged_outcome": "bad_request", "request_id": "4896a885-61ca-4db5-a650-d75f2905388a", "pass": true}
+{"name": "JSON array", "status": 400, "logged_status": 400, "logged_outcome": "bad_request", "request_id": "ebcb0583-89d6-466d-99e8-b664eb31631f", "pass": true}
+{"status": 500, "log_request_calls": 1, "record": {"request_id": "d33e0eab-df22-4b74-8ea8-67a7e8222623", "method": "POST", "path": "/ask", "http_status": 500, "outcome": "error", "question": "What is the application deadline?", "duration_ms": 0.12, "error_type": "RuntimeError"}, "pass": true}
+```
+
+**Criterion 4: Reproducible local execution.** Each trial cloned the repo into its own folder and followed `RUNNING.md` only. The output was captured with `tee` into `results/capstone_c4_trial_1.txt`. Below are the index build (`app.py index`), the health check and `/ask` (`serve.py::health()`, `serve.py::ask()`), then the clone's own log:
+
+```text
+Python 3.13.15
+  chunked  75 chunks, 202 characters on average (shortest 132, longest 281), produced by chunker.py::split_documents
+  stored   75 chunks in 10.8s
+{"corpus":"advice_threads","detail":"ready","index_ready":true,"status":"ok"}
+HTTP 200
+{"answer":"You can only change your meal plan in the first ten days (thread_meal_plan_tier.txt).","best_distance":0.2404,"corpus":"advice_threads","question":"How long do I have to change my meal plan?","refused":false,"sources":["thread_first_year_regret.txt","thread_meal_plan_tier.txt"],"threshold":0.6}
+HTTP 200
+{"timestamp": "2026-11-16T03:26:26.656832+00:00", "request_id": "6d4aaf52-e130-4caa-b947-e4b4b95a3f2a", "method": "POST", "path": "/ask", "http_status": 200, "outcome": "answered", "question": "How long do I have to change my meal plan?", "answer": "You can only change your meal plan in the first ten days (thread_meal_plan_tier.txt).", "sources": ["thread_first_year_regret.txt", "thread_meal_plan_tier.txt"], "n_sources": 2, "best_distance": 0.2404, "prompt_tokens": 444, "output_tokens": 23, "cache_hit": false, "duration_ms": 2189.26, "question_length": 42, "error_type": null, "ts": "2026-11-16T03:26:26.656870+00:00"}
+```
+
+All three clean-checkout trials reused the embedding model already in `~/.cache/chroma` (`onnx_models/`, downloaded 2026-09-16), as criterion 4 permits. The listing is at the top of each `capstone_c4_trial_*.txt`. The index output's "first run downloads the model" is the fixed message `app.py` prints; no download happened.
+
+**Criterion 5: Original RAG behaviour preserved.** Produced by `run_trials.py::criterion_5()`. Each answer came from `/ask`, and each in-scope verdict is `scorer.py::judge()` run against a fresh `store.py::search()` (`criteria["5"]["rows"]`):
+
+```json
+{"kind": "in_scope", "question": "How much does it cost to rent a locker in the commuter lounge for a year?", "expects": "$20", "status": 200, "refused": false, "judge": true, "answer": "It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt)."}
+{"kind": "in_scope", "question": "What is the memory size or RAM recommended for a CS courses?", "expects": "16GB", "status": 200, "refused": false, "judge": true, "answer": "Based on the documents, 16GB of RAM is recommended for CS courses. This comes from `thread_laptop_specs.txt`."}
+{"kind": "in_scope", "question": "When is the closing date or the latest time a student can apply for an internship at large employers?", "expects": "October and November", "status": 200, "refused": false, "judge": true, "answer": "Large employers close applications in October and November for the following summer. \n\nSource: thread_internship_timing.txt"}
+{"kind": "in_scope", "question": "What time is the best to do laundry in the dorms?", "expects": "Tuesday and Wednesday mornings", "status": 200, "refused": false, "judge": true, "answer": "Tuesday and Wednesday mornings are the best times to do laundry in every building (thread_laundry_timing.txt)."}
+{"kind": "in_scope", "question": "How long do I have to change my meal plan?", "expects": "first ten days", "status": 200, "refused": false, "judge": true, "answer": "You can only change your meal plan in the first ten days (from thread_meal_plan_tier.txt)."}
+{"kind": "out_of_scope", "question": "What is the capital of Mongolia?", "status": 200, "refused": true, "best_distance": 0.8935, "answer": "I don't have enough information about that."}
+{"kind": "out_of_scope", "question": "How do I change the oil in a diesel engine?", "status": 200, "refused": true, "best_distance": 0.8964, "answer": "I don't have enough information about that."}
+{"kind": "out_of_scope", "question": "Who won the 1994 World Cup?", "status": 200, "refused": true, "best_distance": 0.8934, "answer": "I don't have enough information about that."}
+```
+
+**Which results repeat across trials, and why.** Criterion 3 and the out-of-scope half of criterion 5 come out the same in all three trials by design. Criterion 3 never calls the model, and retrieval gives the same distances for the same question every time. The model-dependent results do vary between trials, which shows each trial was a real rerun with `cache_hit: false` on every record. For example, the second criterion 1 request used 484, 486, then 481 tokens. Criterion 2's averages were 659.0, 718.8 and 731.5 ms. The criterion 5 answers are worded differently from trial to trial. The trial 1 warm-up (2,766 ms) was a cold start. Trials 2 and 3 ran on the same server without a restart, as criterion 2 requires, so their warm-ups were already warm (844 and 636 ms).
 
 **Observations**
 
-All four automated criteria met their acceptance targets across three trials.
+All five criteria met their acceptance targets in all three trials.
 
-The mean warm-request latency across the three trials was approximately 703.1 ms, below the 1,000 ms target. However, individual requests in the separate structured-logging tests occasionally exceeded three or four seconds.
+The mean warm-request latency across the three trials was approximately 703.1 ms, below the 1,000 ms target. However, individual warm requests in the criterion 1 runs occasionally took three to four seconds: 4,265.71 ms in trial 1 and 3,952.50 ms in trial 2. Within criterion 2's own measured requests, trial 2 had one request at 1,018.44 ms.
 
 This suggests that average latency alone does not fully describe response-time consistency.
-
-Criterion 4 remains pending until the three clean-checkout trials have been documented.
