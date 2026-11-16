@@ -319,7 +319,18 @@ python app.py index
 AI201_CACHE=0 python serve.py
 ```
 
-It listens on **http://localhost:5001**.
+It listens on **http://localhost:5001**. Before it starts listening, it warms
+up for about 1.5–2.5 seconds and prints, for example:
+
+```text
+Warming up (loading index, embedding model and Gemini client)...
+Warm-up done in 2079 ms: pipeline import 3 ms; retrieval + embedder 1181 ms; Gemini client 896 ms
+Serving The Unofficial Guide on http://localhost:5001
+```
+
+Wait for the `Serving` line before sending requests. If warm-up reports a step
+as `FAILED` (for example, no API key), the server still starts, and `/health`
+and `/ask` report the problem.
 
 - **Why 5001, not 5000:** on macOS, AirPlay Receiver already listens on port
   5000 and answers every request with an empty `403 Forbidden`, so requests
@@ -385,8 +396,35 @@ jq -c '{outcome, http_status, duration_ms, prompt_tokens, output_tokens, questio
 ```
 
 `duration_ms` does not include writing the log line or network time to the
-client. The **first** `/ask` after start-up is slower: it loads Chroma and the
-index.
+client. Because the server warms up at start-up, the first `/ask` is about as
+fast as later ones. That's only true under `python serve.py`: `gunicorn serve:app`
+skips the warm-up, so its first request is about 1.5 s slower.
+
+## Acceptance trials and cold-start measurement
+
+These produce the Milestone 5 and 6 evidence in `results/`.
+
+With the server running (`AI201_CACHE=0 python serve.py`), in a second terminal:
+
+```bash
+python run_trials.py --trial 1 --label after
+python run_trials.py --trial 2 --label after
+python run_trials.py --trial 3 --label after
+```
+
+Each run tests criteria 1, 2, 3 and 5 from `criteria.md` and writes
+`results/capstone_trial_<N>_<label>.json`. With no `--label`, the file is
+`capstone_trial_<N>.json`. Existing files are never overwritten.
+
+Cold start: stop any running server first, because this script starts and
+stops its own, three times:
+
+```bash
+python measure_cold_start.py --label after
+```
+
+It writes `results/capstone_coldstart_<label>.json` with the start-up time and
+the first-request time for each fresh start.
 
 ## Tests
 

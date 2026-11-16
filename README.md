@@ -392,9 +392,11 @@ My corpus produced 75 chunks, and `python app.py chunks -n 5` returned the same 
 
 ## Capstone
 
-**The System**
+**What This Extends**
 
 I chose to extend The Unofficial Guide, my RAG-based question-answering system from Units 1–2. The system retrieves relevant information from the `advice_threads` corpus, checks whether the question is supported by the retrieved documents, and generates an answer grounded in those documents.
+
+**What's new this unit:** the HTTP service (`serve.py`) now writes a structured JSONL record for every request: input, output, sources, retrieval distance, Gemini tokens, cache hit, duration and outcome, including 400s and 500s (`request_log.py`, `serve.py::record_request`). It has a documented single-command local run path (`RUNNING.md`), test tooling that checks the criteria (`run_trials.py`, `measure_cost.py`, `measure_cold_start.py`), and a start-up warm-up (`serve.py::warm_up`) added in Milestone 6. Retrieval, the relevance gate and answer generation are unchanged.
 
 **The Shape**
 
@@ -411,6 +413,24 @@ The service will run locally using a documented command, and the logs will provi
 - I will not build a frontend, monitoring dashboard, or external database.
 
 The goal is to make the existing system observable and reproducible, not to change how it answers questions.
+
+**Running It**
+
+Path B, local with logs. Full steps are in [RUNNING.md](RUNNING.md#running-the-unofficial-guide-capstone). In short:
+
+| Need              | Value                                                                                                                                    |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Python            | 3.13 (tested on 3.13.15); 3.11–3.13 supported, not 3.14                                                                                  |
+| Dependencies      | `pip install -r requirements.txt`, every package pinned with lower and upper bounds                                                      |
+| Model files       | Chroma's ONNX `all-MiniLM-L6-v2`, downloaded automatically into `~/.cache/chroma` on the first `python app.py index`, **166 MB** on disk |
+| API key           | `GEMINI_API_KEY` in `.env` (copy `.env.example`)                                                                                         |
+| Index             | `python app.py index` (a fresh clone has none; `chroma_db/` is in `.gitignore`)                                                          |
+| **Start command** | `AI201_CACHE=0 python serve.py`, which serves on http://localhost:5001 (port 5000 is taken by macOS AirPlay)                             |
+| Log               | `logs/requests.jsonl`, one JSON record per request                                                                                       |
+
+The run path was tested from a fresh clone, following `RUNNING.md` alone, six times: three clean-checkout trials before the fix and three after (`results/capstone_c4_trial_*.txt`).
+
+**Commit trail.** The criteria were committed on their own in `849f484` ("Capstone Milestone 4: Add 5 acceptance criteria"), before any trial ran. The first commit carrying trial results is `ae5504c` ("Capstone Milestone 5: three trials for all five criteria"). The earlier `results/capstone_m3_session.jsonl` (`22d01ba`) is the Milestone 3 instrumentation session that the brief requires before the criteria; it is not a criteria trial.
 
 **Instrumentation**
 
@@ -453,6 +473,37 @@ The session below was produced with `AI201_CACHE=0 python serve.py` and `python 
 - **The first request after start-up is slower** because it loads Chroma and the index. It's included in the average, as one of the ten.
 
 **In money:** the project runs on Gemini's free tier, so the actual spend was $0. The real cost is the tokens above, taken from the free tier's request and token quota.
+
+**Per-run cost, from all the measured trials.** The table above is the first 10-request session. The Milestone 5 and 6 trials give a larger sample: every answered, non-cached request in criteria 1 and 2 across all six trials (before and after the fix), **126 real Gemini calls**, read from `prompt_tokens`, `output_tokens` and `duration_ms` in `results/capstone_trial_*.json`.
+
+| Per answered question       | Average |
+| --------------------------- | ------- |
+| Prompt tokens               | 448.0   |
+| Output tokens               | 26.4    |
+| Total tokens                | 474.4   |
+| Server time (`duration_ms`) | 917 ms  |
+
+Converted to money at the paid-tier list price for `gemini-3.5-flash-lite`, **$0.30 per 1M input tokens and $2.50 per 1M output tokens**. This rate is reported by third-party pricing pages; I did not confirm it on Google's own rate sheet.
+
+```text
+input:   448.0 tokens × $0.30 / 1,000,000 = $0.0001344
+output:   26.4 tokens × $2.50 / 1,000,000 = $0.0000660
+                                     total = $0.0002004 per answered question  (about $0.0002)
+```
+
+A question the relevance gate refuses costs **$0**: it never reaches Gemini, so it uses 0 tokens and about 75 ms of local compute.
+
+**For a hundred people a day.** Assumption: each person asks 3 questions, and every question is answered (the worst case, because refusals are free).
+
+```text
+questions:  100 people × 3 questions               = 300 questions/day
+tokens:     300 × 474.4 tokens                     = 142,320 tokens/day
+money:      300 × $0.0002004                       = $0.060/day
+            $0.060 × 30 days                       = $1.80/month
+compute:    300 × 0.917 s                          = 275 s/day (about 4.6 minutes of server time)
+```
+
+**Running this for a hundred people a day would cost about 6 cents a day, or $1.80 a month, at paid-tier prices, and $0 on the free tier.** The model is not the expensive part of this system. What limits it at that scale is the free tier's per-minute request limit (the code paces itself at `config.REQUESTS_PER_MINUTE = 30`) and the latency variation diagnosed in Milestone 6.
 
 **Run Log and Verdicts — Before Improvement**
 
@@ -587,7 +638,7 @@ Scored against data I already have, the tighter targets would have given:
 | Every warm request ≤ 1,500 ms (criterion 2's 10 requests) | MET: slowest 949 / 1,018 / 957 ms    | **MISSED**: slowest 1,152 / **3,514** / **1,731** ms |
 | First request after a fresh start ≤ 1,000 ms, 3 of 3      | **MISSED**: 2,529 / 2,165 / 1,994 ms | **MISSED** (2 of 3): 569 / **1,010** / 651 ms        |
 
-Two honest notes on these results. First, the slowest warm requests in the before trials (4,266 ms and 3,953 ms) fell in criterion 1's requests, not criterion 2's, so even the per-request target would not have caught them; applying it to every warm `/ask` in a trial would. Second, the cold-start target would still miss after the fix, by 10 ms in one run. The fix removed the start-up cost, but what remains is the model's own response time, and a 1,000 ms limit leaves almost no room for it.
+Two honest notes on these results. First, the slowest warm requests in the before trials (4,266 ms and 3,953 ms) fell in criterion 1's requests, not criterion 2's, so even the per-request target would not have caught them. This is applying it to every warm `/ask` in a trial would. Second, the cold-start target would still miss after the fix, by 10 ms in one run. The fix removed the start-up cost, but what remains is the model's own response time, and a 1,000 ms limit leaves almost no room for it.
 
 The original `criteria.md` remains unchanged so the before-and-after results can be compared against the same standards.
 
@@ -708,3 +759,26 @@ This is the same weakness named under _Assessment of the Targets_: an average-ba
 - **Log retrieval and generation time separately** (`retrieval_ms`, `generation_ms`), so a slow request can be attributed to a stage directly instead of by inference.
 - **Tighten criterion 2** to a per-request or slowest-1-in-10 target instead of an average, plus a separate target for the first request after a fresh start. With these data, an average hides exactly the requests a user would notice.
 - **Move the warm-up into module load or a gunicorn hook**, so it also runs when a host starts the service.
+
+**What's Still Broken**
+
+**Criterion 2 (warm-request latency) is still missed after the fix,** in after-trials 2 and 3 (averages 1,039.2 ms and 1,104.3 ms against a 1,000 ms target). It is the only criterion missed in the final run.
+
+- **What I'd do:** first, log `retrieval_ms` and `generation_ms` separately, so the slow requests can be attributed to the Gemini call by measurement rather than by inference. Then, if the slow time really is the model, add a timeout and retry around the Gemini call in `generate.py`, or test a faster model, so a single slow response can't drag a whole trial over the line.
+- **Why I stopped:** the cause is outside the part of the system this capstone set out to change. Both fixes touch answer generation, which I put out of scope in Milestone 1 ("I will not change the relevance threshold, Gemini model, or grounded-answer generation"). Changing it now would also mean the after-run no longer measures only the start-up fix.
+
+**Targets set too low, even where criteria were met.** Criteria 1 and 3 test code paths that behave the same every time and were already covered by `test_capstone_logging.py`, so they could hardly fail. Criterion 2's average was the loose one; under _Criterion I Would Tighten_ I tighten it to every warm request ≤ 1,500 ms (10 of 10) and the first request after a fresh start ≤ 1,000 ms (3 of 3). Scored on my own data, the tighter version is missed after the fix as well.
+
+**If I Had Another Unit**
+
+The first thing I'd do is split `duration_ms` into `retrieval_ms` and `generation_ms` in the request log. My only remaining miss rests on an inference I can't prove from the current log. Every other fix, whether a timeout, a retry, a different model or a tighter target, depends on knowing which stage the slow time is in.
+
+**How I Used AI (Capstone)**
+
+**1. Scope and the build.** I used Claude to check my Milestone 1 scope against the brief and to review the code I wrote for Milestone 2. It found real bugs in my first version of the logging hooks in `serve.py`: `g` and `datetime` were never imported, and `g.refused = outcome["refused"]` sat inside the `except` block, where `outcome` doesn't exist, which would have mislabelled every refusal. I fixed those myself. Claude then hardened `request_log.py` so a logging failure can never break a request.
+
+**2. Getting it running.** When my requests returned nothing, Claude found that macOS AirPlay was answering on port 5000, so I moved the service to 5001. Claude also noticed that my first Milestone 3 session had answer times of 55–144 ms, too fast to be real Gemini calls, meaning they were cache hits. That is why the log now has a `cache_hit` field and every measured run uses `AI201_CACHE=0`. My own clean-clone test found that the `# comments` in `RUNNING.md` broke when pasted into zsh, and I had Claude remove them.
+
+**3. Criteria.** I wrote the five capstone criteria myself. I asked Claude to review them without rewriting them: for each one, how it would test it from the wording alone, whether two people would score it the same, and what would make it fail. Over three rounds that review found ambiguities I then fixed, including no cache setting, request IDs the client never receives, and `judge()` needing retrieval results that `/ask` doesn't return. For the Milestone 6 tightened targets, Claude laid out options from my data and I chose the numbers.
+
+**4. Testing tools and the fix.** Claude wrote the test tooling (`run_trials.py`, `measure_cost.py`, `measure_cold_start.py`, `run_capstone_requests.py`) to follow my criteria as written. It timed each lazy start-up step, which became my Milestone 6 diagnosis, and it wrote `serve.py::warm_up()`. I ran every trial, every clean-clone test and every measurement myself. Claude checked the results and pointed out when a run was invalid: the first after-fix clones tested old code because I hadn't pushed.
