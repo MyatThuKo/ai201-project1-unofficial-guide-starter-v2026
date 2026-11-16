@@ -622,7 +622,7 @@ Same criteria, same `run_trials.py`, same question sets, server started once wit
 | 1. Logging completeness   | 10/10          | 10/10                      | 10/10                            | 10/10                            | MET        |
 | 2. Warm-request latency   | ≤ 1,000 ms avg | 822.4 ms (432.19–1,151.94) | **1,039.2 ms** (477.26–3,514.16) | **1,104.3 ms** (590.07–1,730.78) | **MISSED** |
 | 3. Failure observability  | 6/6            | 6/6                        | 6/6                              | 6/6                              | MET        |
-| 4. Reproducible execution | 5/5 steps      | _pending_                  | _pending_                        | _pending_                        | _pending_  |
+| 4. Reproducible execution | 5/5 steps      | 5/5                        | 5/5                              | 5/5                              | MET        |
 | 5. RAG behaviour          | 8/8            | 8/8                        | 8/8                              | 8/8                              | MET        |
 
 **Before and after, side by side**
@@ -632,8 +632,25 @@ Same criteria, same `run_trials.py`, same question sets, server started once wit
 | 1. Logging completeness   | 10/10, 10/10, 10/10    | MET    | 10/10, 10/10, 10/10        | MET        |
 | 2. Warm-request latency   | 659.0, 718.8, 731.5 ms | MET    | 822.4, 1,039.2, 1,104.3 ms | **MISSED** |
 | 3. Failure observability  | 6/6, 6/6, 6/6          | MET    | 6/6, 6/6, 6/6              | MET        |
-| 4. Reproducible execution | 5/5, 5/5, 5/5          | MET    | _pending_                  | _pending_  |
+| 4. Reproducible execution | 5/5, 5/5, 5/5          | MET    | 5/5, 5/5, 5/5              | MET        |
 | 5. RAG behaviour          | 8/8, 8/8, 8/8          | MET    | 8/8, 8/8, 8/8              | MET        |
+
+**Criterion 4 after the fix.** Each trial was a fresh clone of commit `a662dc9`, which includes the fix. The output was captured with `tee` into `results/capstone_c4_trial_{1,2,3}_after.txt`. Every trial installed the dependencies, built the index (75 chunks), started the service, returned `index_ready: true`, and answered one `/ask` with a log line. The server's own start-up output, now also captured, shows the fix running in each clone:
+
+```text
+Warm-up done in 2488 ms: pipeline import 4 ms; retrieval + embedder 1537 ms; Gemini client 946 ms
+Warm-up done in 2079 ms: pipeline import 3 ms; retrieval + embedder 1181 ms; Gemini client 896 ms
+Warm-up done in 2610 ms: pipeline import 3 ms; retrieval + embedder 1498 ms; Gemini client 1109 ms
+```
+
+The clean-checkout trials also confirm the improvement on their own. In each fresh clone, the first `/ask` is the first request a newly started server answers:
+
+| Fresh clone | First `/ask` before the fix | First `/ask` after the fix |
+| ----------- | --------------------------- | -------------------------- |
+| Trial 1     | 2,189.26 ms                 | 771.39 ms                  |
+| Trial 2     | 2,285.34 ms                 | 703.40 ms                  |
+| Trial 3     | 3,984.06 ms                 | 586.26 ms                  |
+| Average     | 2,819.6 ms                  | 687.0 ms                   |
 
 **Diagnosis of the Criterion 2 Miss**
 
