@@ -552,3 +552,43 @@ All five criteria met their acceptance targets in all three trials.
 The mean warm-request latency across the three trials was approximately 703.1 ms, below the 1,000 ms target. However, individual warm requests in the criterion 1 runs occasionally took three to four seconds: 4,265.71 ms in trial 1 and 3,952.50 ms in trial 2. Within criterion 2's own measured requests, trial 2 had one request at 1,018.44 ms.
 
 This suggests that average latency alone does not fully describe response-time consistency.
+
+**Milestone 6 — Diagnosis and Improvement**
+
+**Verdicts**
+
+All five automated acceptance criteria were MET across three trials.
+
+No missed automated criterion required diagnosis. However, the results exposed a limitation in the latency criterion.
+
+**Assessment of the Targets**
+
+Criterion 2 measured average warm-request latency and excluded the first request after startup. Although all three trials met the 1,000 ms average target, the first request in Trial 1 took 2,766.31 ms.
+
+Individual requests in the logging tests also reached 4,265.71 ms and 3,952.50 ms.
+
+The original average-based target therefore did not capture cold-start overhead or occasional latency spikes.
+
+**Criterion I Would Tighten**
+
+I would tighten Criterion 2 in a future evaluation by including first-request latency after a fresh server start and setting a separate measurable target for it.
+
+The original `criteria.md` remains unchanged so the before-and-after results can be compared against the same standards.
+
+**Diagnosis**
+
+Preliminary measurements suggest that initialization of the Chroma client, ONNX embedding model, and Gemini client contributes to first-request latency.
+
+These dependencies are initialized lazily, so the first request may perform setup work in addition to answering the question.
+
+**Chosen Improvement**
+
+I will move the initialization of existing dependencies into the service startup process without changing retrieval, relevance gating, or answer generation.
+
+**Measurement Plan**
+
+I will measure three cold-request durations before and after the change, along with service startup time.
+
+After implementing the improvement, I will rerun the original acceptance tests and compare the results.
+
+I will report whether cold-request latency improved, whether startup time increased, and whether any original acceptance criterion regressed.

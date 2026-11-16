@@ -325,9 +325,12 @@ def criterion_5() -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--trial", type=int, required=True, choices=[1, 2, 3])
+    parser.add_argument("--label", default="",
+                        help="suffix for the output file, e.g. 'after' -> capstone_trial_1_after.json")
     args = parser.parse_args()
 
-    out_path = RESULTS_DIR / f"capstone_trial_{args.trial}.json"
+    suffix = f"_{args.label}" if args.label else ""
+    out_path = RESULTS_DIR / f"capstone_trial_{args.trial}{suffix}.json"
     if out_path.exists():
         print(f"{out_path.name} already exists. Delete it first if you mean to re-run trial {args.trial}.")
         return 1
@@ -360,6 +363,7 @@ def main() -> int:
 
     trial = {
         "trial": args.trial,
+        "label": args.label or "before",
         "started": started,
         "finished": datetime.now(timezone.utc).isoformat(),
         "base_url": BASE_URL,
