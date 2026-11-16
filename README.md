@@ -577,18 +577,101 @@ The original `criteria.md` remains unchanged so the before-and-after results can
 
 **Diagnosis**
 
-Preliminary measurements suggest that initialization of the Chroma client, ONNX embedding model, and Gemini client contributes to first-request latency.
+**Stage:** service start-up. **Mechanism:** the pipeline's heavy dependencies are created lazily, inside the first `/ask` a fresh server receives, so the first user pays for set-up as well as for their answer.
 
-These dependencies are initialized lazily, so the first request may perform setup work in addition to answering the question.
+I timed each lazy step on its own (no Gemini call):
+
+| Created on first use                                      | Where                                                                | Time    |
+| --------------------------------------------------------- | -------------------------------------------------------------------- | ------- |
+| Chroma client                                             | `store.py::_client`                                                  | 184 ms  |
+| ONNX embedding model (loads on the first thing it embeds) | `store.py::search` (707 ms on the first search, 65 ms on the second) | ~640 ms |
+| Gemini client                                             | `generate.py::_get_client`                                           | 483 ms  |
+
+Together that is about 1.3 s that only the first request pays. The cold-start measurement below confirms it: the first request after a fresh start averaged 2,230 ms, against about 700 ms for a warm request.
 
 **Chosen Improvement**
 
-I will move the initialization of existing dependencies into the service startup process without changing retrieval, relevance gating, or answer generation.
+I added `serve.py::warm_up()`, called from `main()` before `app.run()`. It imports the pipeline, runs one real `store.search()` (which opens the Chroma client and loads the embedding model), and creates the Gemini client. It makes no Gemini API call, uses no tokens, and writes nothing to the request log. Retrieval, the relevance gate and answer generation are unchanged; the same functions are just called earlier. If warm-up fails (no index, no API key), it reports the failure and the server still starts, so `/health` and `/ask` behave exactly as before.
 
 **Measurement Plan**
 
-I will measure three cold-request durations before and after the change, along with service startup time.
+1. Measure three cold first requests and the start-up time on the unchanged code (`python measure_cold_start.py --label before`, committed in `1662b4b` before the fix).
+2. Make the fix (`e86211d`).
+3. Measure the same way again (`--label after`).
+4. Rerun the full acceptance set, three trials each, in the same format (`python run_trials.py --trial N --label after`, plus three fresh clones for criterion 4).
 
-After implementing the improvement, I will rerun the original acceptance tests and compare the results.
+`measure_cold_start.py` launches `python serve.py` itself and checks readiness by opening a TCP connection, not by calling `/health`, because `/health` opens the Chroma client and would warm up part of what is being measured.
 
-I will report whether cold-request latency improved, whether startup time increased, and whether any original acceptance criterion regressed.
+**Results: Cold Start Before and After**
+
+From `results/capstone_coldstart_before.json` and `results/capstone_coldstart_after.json`, produced by `measure_cold_start.py::one_cold_start()`. Each run is a brand-new server process with `AI201_CACHE=0`. All six first requests were real answers: HTTP 200, `cache_hit: false`, 460 prompt tokens.
+
+| Measure                                              | Before (runs 1 / 2 / 3)  | Before avg   | After (runs 1 / 2 / 3)   | After avg    | Change               |
+| ---------------------------------------------------- | ------------------------ | ------------ | ------------------------ | ------------ | -------------------- |
+| First request after a fresh start                    | 2,529 / 2,165 / 1,994 ms | **2,230 ms** | 569 / 1,010 / 651 ms     | **743 ms**   | **−1,486 ms (−67%)** |
+| Start-up (launch until the port accepts connections) | 161 / 142 / 190 ms       | **164 ms**   | 2,100 / 1,478 / 1,519 ms | **1,699 ms** | **+1,535 ms**        |
+
+The same effect shows up in the full trials. Criterion 2's warm-up request in trial 1, the first request a freshly started server answered, took **2,766 ms before** the fix and **725 ms after**.
+
+**Run Log and Verdicts — After Improvement**
+
+Same criteria, same `run_trials.py`, same question sets, server started once with `AI201_CACHE=0` and not restarted between trials. Results are in `results/capstone_trial_{1,2,3}_after.json`.
+
+| Criterion                 | Target         | Run 1                      | Run 2                            | Run 3                            | Verdict    |
+| ------------------------- | -------------- | -------------------------- | -------------------------------- | -------------------------------- | ---------- |
+| 1. Logging completeness   | 10/10          | 10/10                      | 10/10                            | 10/10                            | MET        |
+| 2. Warm-request latency   | ≤ 1,000 ms avg | 822.4 ms (432.19–1,151.94) | **1,039.2 ms** (477.26–3,514.16) | **1,104.3 ms** (590.07–1,730.78) | **MISSED** |
+| 3. Failure observability  | 6/6            | 6/6                        | 6/6                              | 6/6                              | MET        |
+| 4. Reproducible execution | 5/5 steps      | _pending_                  | _pending_                        | _pending_                        | _pending_  |
+| 5. RAG behaviour          | 8/8            | 8/8                        | 8/8                              | 8/8                              | MET        |
+
+**Before and after, side by side**
+
+| Criterion                 | Before (T1 / T2 / T3)  | Before | After (T1 / T2 / T3)       | After      |
+| ------------------------- | ---------------------- | ------ | -------------------------- | ---------- |
+| 1. Logging completeness   | 10/10, 10/10, 10/10    | MET    | 10/10, 10/10, 10/10        | MET        |
+| 2. Warm-request latency   | 659.0, 718.8, 731.5 ms | MET    | 822.4, 1,039.2, 1,104.3 ms | **MISSED** |
+| 3. Failure observability  | 6/6, 6/6, 6/6          | MET    | 6/6, 6/6, 6/6              | MET        |
+| 4. Reproducible execution | 5/5, 5/5, 5/5          | MET    | _pending_                  | _pending_  |
+| 5. RAG behaviour          | 8/8, 8/8, 8/8          | MET    | 8/8, 8/8, 8/8              | MET        |
+
+**Diagnosis of the Criterion 2 Miss**
+
+Criterion 2 missed in after-trials 2 and 3. The target has to hold in all three trials, so the verdict is MISSED.
+
+**Stage:** generation, the Gemini API call in `generate.py::generate`. **Mechanism:** Gemini's response time varies from minute to minute, and criterion 2's target is an _average of ten requests_, so one slow response, or a few slow minutes, pushes the whole trial over 1,000 ms.
+
+The per-request durations show both patterns (`criteria["2"]["durations_ms"]`):
+
+| Trial     | Median  | Average     | Measured durations (ms)                                                                    |
+| --------- | ------- | ----------- | ------------------------------------------------------------------------------------------ |
+| Before T1 | 601.4   | 659.0       | 624.79, 850.05, 949.13, 577.99, 792.19, 512.29, 556.81, 505.97, 491.97, 729.11             |
+| Before T2 | 682.1   | 718.8       | 682.26, 879.10, 663.66, 791.62, 535.33, 589.25, 1,018.44, 682.03, 695.22, 650.84           |
+| Before T3 | 687.9   | 731.5       | 898.56, 590.75, 655.67, 690.40, 878.99, 957.27, 868.04, 588.90, 500.58, 685.49             |
+| After T1  | 881.8   | 822.4       | 659.12, 867.64, 1,151.94, 672.43, 1,067.55, 649.48, 918.06, 432.19, 896.01, 909.84         |
+| After T2  | 712.1   | **1,039.2** | 477.26, 762.48, 655.81, 661.70, **3,514.16**, 952.69, 658.07, 924.09, 1,168.71, 617.43     |
+| After T3  | 1,136.9 | **1,104.3** | 1,730.78, 881.97, 664.17, 1,185.07, 1,378.01, 1,088.64, 1,480.62, 590.07, 1,384.59, 659.29 |
+
+- **After T2 is one outlier.** Its median (712 ms) is almost the same as before (682 ms). A single 3,514 ms response lifted the average from about 760 ms to 1,039 ms.
+- **After T3 was slow throughout** (median 1,137 ms). Its unmeasured warm-up took 2,828 ms on a server that had already warmed up and already served two trials, so that time cannot be start-up. It was spent waiting on the model.
+
+**Why the fix is not the cause:** commit `e86211d` only adds `warm_up()` before `app.run()`. A warm request runs exactly the same code as before the fix (the `/ask` handler, retrieval, the gate and generation are unchanged), and Gemini received identical prompts (prompt tokens 460, 459, 446 … in both before and after trials).
+
+**Limit of this diagnosis:** the log records only total `duration_ms`. It does not split retrieval time from Gemini time, so attributing the slow requests to Gemini is an inference from the evidence above, not a direct measurement.
+
+This is the same weakness named under _Assessment of the Targets_: an average-based latency target is sensitive to single spikes. In the before trials, spikes of 4,265 ms and 3,952 ms happened to land in criterion 1's requests, not criterion 2's. After the fix, they landed in criterion 2's.
+
+**Did It Help?**
+
+**Yes, for what it targeted, at a cost, and with no effect on warm requests.**
+
+- **Helped:** the first request after a fresh start dropped from 2,230 ms to 743 ms, which is now the same as a warm request. The first user no longer pays for set-up.
+- **The trade-off:** start-up went from 164 ms to 1,699 ms. The work moved; it did not disappear. Start-up plus first request totals about 2,394 ms before and 2,442 ms after. The fix helps whenever the server is started before a user arrives, which is how a running service is used. It does not help someone who starts the server and asks a question immediately.
+- **No effect on warm requests:** the fix does not touch the request path, and criterion 2's miss after the fix comes from the model's response time, not from this change.
+- **Limitation:** `warm_up()` runs only from `main()`, so `python serve.py` (the Path B run command) benefits. `gunicorn serve:app` never calls `main()` and would still start cold.
+
+**What I'd Do Next**
+
+- **Log retrieval and generation time separately** (`retrieval_ms`, `generation_ms`), so a slow request can be attributed to a stage directly instead of by inference.
+- **Tighten criterion 2** to a per-request or slowest-1-in-10 target instead of an average, plus a separate target for the first request after a fresh start. With these data, an average hides exactly the requests a user would notice.
+- **Move the warm-up into module load or a gunicorn hook**, so it also runs when a host starts the service.

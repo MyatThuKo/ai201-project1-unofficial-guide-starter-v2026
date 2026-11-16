@@ -1,0 +1,1291 @@
+{
+  "trial": 1,
+  "label": "after",
+  "started": "2026-11-16T04:05:25.478669+00:00",
+  "finished": "2026-11-16T04:07:10.237791+00:00",
+  "base_url": "http://localhost:5001",
+  "model": "gemini-3.5-flash-lite",
+  "threshold": 0.6,
+  "criteria": {
+    "1": {
+      "criterion": 1,
+      "met": true,
+      "passing_records": 10,
+      "of": 10,
+      "problems": [],
+      "checks": [
+        {
+          "n": 1,
+          "request_id": "01cf8fce-1dea-4065-9f61-86a68b10ec56",
+          "issues": []
+        },
+        {
+          "n": 2,
+          "request_id": "97484e74-8a67-4b17-a94d-03e1b295334a",
+          "issues": []
+        },
+        {
+          "n": 3,
+          "request_id": "8878f42e-67e3-41da-a15d-93f6bbc41a83",
+          "issues": []
+        },
+        {
+          "n": 4,
+          "request_id": "efa6ae47-0829-41d7-aad9-c5a5503d0d7c",
+          "issues": []
+        },
+        {
+          "n": 5,
+          "request_id": "101f20ed-5b17-488b-bc35-b8d4a84e3f91",
+          "issues": []
+        },
+        {
+          "n": 6,
+          "request_id": "65414395-b391-4a50-bb21-f31074d424f6",
+          "issues": []
+        },
+        {
+          "n": 7,
+          "request_id": "4f7e7271-00f6-43af-8e94-e5cd08d4c19a",
+          "issues": []
+        },
+        {
+          "n": 8,
+          "request_id": "e28115c2-954f-46cd-9c3b-f0b0ae390298",
+          "issues": []
+        },
+        {
+          "n": 9,
+          "request_id": "630af298-0efa-4d7d-b39d-35f35cc750d3",
+          "issues": []
+        },
+        {
+          "n": 10,
+          "request_id": "9afbfe0f-adc6-4395-9ea1-b3748fad6b53",
+          "issues": []
+        }
+      ],
+      "responses": [
+        {
+          "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+          "status": 200,
+          "body": {
+            "answer": "It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).",
+            "best_distance": 0.2786,
+            "corpus": "advice_threads",
+            "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+            "refused": false,
+            "sources": [
+              "thread_bike_commute.txt",
+              "thread_commuting.txt",
+              "thread_laundry_timing.txt",
+              "thread_study_spots.txt"
+            ],
+            "threshold": 0.6
+          }
+        },
+        {
+          "question": "What is the memory size or RAM recommended for a CS courses?",
+          "status": 200,
+          "body": {
+            "answer": "A RAM size of 16GB is recommended for CS courses. \n\nSource: thread_laptop_specs.txt",
+            "best_distance": 0.243,
+            "corpus": "advice_threads",
+            "question": "What is the memory size or RAM recommended for a CS courses?",
+            "refused": false,
+            "sources": [
+              "thread_first_year_regret.txt",
+              "thread_laptop_specs.txt",
+              "thread_pass_fail.txt"
+            ],
+            "threshold": 0.6
+          }
+        },
+        {
+          "question": "When is the closing date or the latest time a student can apply for an internship at large employers?",
+          "status": 200,
+          "body": {
+            "answer": "Large employers close applications for summer internships in October and November for the following summer. \n\nSource: thread_internship_timing.txt",
+            "best_distance": 0.2386,
+            "corpus": "advice_threads",
+            "question": "When is the closing date or the latest time a student can apply for an internship at large employers?",
+            "refused": false,
+            "sources": [
+              "thread_first_year_regret.txt",
+              "thread_internship_timing.txt",
+              "thread_late_work.txt"
+            ],
+            "threshold": 0.6
+          }
+        },
+        {
+          "question": "What time is the best to do laundry in the dorms?",
+          "status": 200,
+          "body": {
+            "answer": "Tuesday and Wednesday mornings are the best times to do laundry in every building. \n\nSource: thread_laundry_timing.txt",
+            "best_distance": 0.2749,
+            "corpus": "advice_threads",
+            "question": "What time is the best to do laundry in the dorms?",
+            "refused": false,
+            "sources": [
+              "thread_commuting.txt",
+              "thread_laundry_timing.txt",
+              "thread_roommate_conflict.txt"
+            ],
+            "threshold": 0.6
+          }
+        },
+        {
+          "question": "How long do I have to change my meal plan?",
+          "status": 200,
+          "body": {
+            "answer": "You can only change your meal plan in the first ten days (from `thread_meal_plan_tier.txt`).",
+            "best_distance": 0.2404,
+            "corpus": "advice_threads",
+            "question": "How long do I have to change my meal plan?",
+            "refused": false,
+            "sources": [
+              "thread_first_year_regret.txt",
+              "thread_meal_plan_tier.txt"
+            ],
+            "threshold": 0.6
+          }
+        },
+        {
+          "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+          "status": 200,
+          "body": {
+            "answer": "It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).",
+            "best_distance": 0.2786,
+            "corpus": "advice_threads",
+            "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+            "refused": false,
+            "sources": [
+              "thread_bike_commute.txt",
+              "thread_commuting.txt",
+              "thread_laundry_timing.txt",
+              "thread_study_spots.txt"
+            ],
+            "threshold": 0.6
+          }
+        },
+        {
+          "question": "What is the memory size or RAM recommended for a CS courses?",
+          "status": 200,
+          "body": {
+            "answer": "Based on the documents, 16GB of RAM is recommended for CS courses. \n\nSource: thread_laptop_specs.txt",
+            "best_distance": 0.243,
+            "corpus": "advice_threads",
+            "question": "What is the memory size or RAM recommended for a CS courses?",
+            "refused": false,
+            "sources": [
+              "thread_first_year_regret.txt",
+              "thread_laptop_specs.txt",
+              "thread_pass_fail.txt"
+            ],
+            "threshold": 0.6
+          }
+        },
+        {
+          "question": "When is the closing date or the latest time a student can apply for an internship at large employers?",
+          "status": 200,
+          "body": {
+            "answer": "Large employers close their internship applications in October and November for the following summer. \n\nSource: thread_internship_timing.txt",
+            "best_distance": 0.2386,
+            "corpus": "advice_threads",
+            "question": "When is the closing date or the latest time a student can apply for an internship at large employers?",
+            "refused": false,
+            "sources": [
+              "thread_first_year_regret.txt",
+              "thread_internship_timing.txt",
+              "thread_late_work.txt"
+            ],
+            "threshold": 0.6
+          }
+        },
+        {
+          "question": "What time is the best to do laundry in the dorms?",
+          "status": 200,
+          "body": {
+            "answer": "Tuesday and Wednesday mornings are the best times to do laundry in every building. \n\nSource: thread_laundry_timing.txt",
+            "best_distance": 0.2749,
+            "corpus": "advice_threads",
+            "question": "What time is the best to do laundry in the dorms?",
+            "refused": false,
+            "sources": [
+              "thread_commuting.txt",
+              "thread_laundry_timing.txt",
+              "thread_roommate_conflict.txt"
+            ],
+            "threshold": 0.6
+          }
+        },
+        {
+          "question": "How long do I have to change my meal plan?",
+          "status": 200,
+          "body": {
+            "answer": "You can only change your meal plan in the first ten days (from `thread_meal_plan_tier.txt`).",
+            "best_distance": 0.2404,
+            "corpus": "advice_threads",
+            "question": "How long do I have to change my meal plan?",
+            "refused": false,
+            "sources": [
+              "thread_first_year_regret.txt",
+              "thread_meal_plan_tier.txt"
+            ],
+            "threshold": 0.6
+          }
+        }
+      ],
+      "log_records": [
+        {
+          "timestamp": "2026-11-16T04:06:08.270337+00:00",
+          "request_id": "01cf8fce-1dea-4065-9f61-86a68b10ec56",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+          "answer": "It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).",
+          "sources": [
+            "thread_bike_commute.txt",
+            "thread_commuting.txt",
+            "thread_laundry_timing.txt",
+            "thread_study_spots.txt"
+          ],
+          "n_sources": 4,
+          "best_distance": 0.2786,
+          "prompt_tokens": 460,
+          "output_tokens": 23,
+          "cache_hit": false,
+          "duration_ms": 729.82,
+          "question_length": 73,
+          "error_type": null,
+          "ts": "2026-11-16T04:06:08.270407+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:06:11.848159+00:00",
+          "request_id": "97484e74-8a67-4b17-a94d-03e1b295334a",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "What is the memory size or RAM recommended for a CS courses?",
+          "answer": "A RAM size of 16GB is recommended for CS courses. \n\nSource: thread_laptop_specs.txt",
+          "sources": [
+            "thread_first_year_regret.txt",
+            "thread_laptop_specs.txt",
+            "thread_pass_fail.txt"
+          ],
+          "n_sources": 3,
+          "best_distance": 0.243,
+          "prompt_tokens": 459,
+          "output_tokens": 25,
+          "cache_hit": false,
+          "duration_ms": 566.88,
+          "question_length": 60,
+          "error_type": null,
+          "ts": "2026-11-16T04:06:11.848222+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:06:15.493463+00:00",
+          "request_id": "8878f42e-67e3-41da-a15d-93f6bbc41a83",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "When is the closing date or the latest time a student can apply for an internship at large employers?",
+          "answer": "Large employers close applications for summer internships in October and November for the following summer. \n\nSource: thread_internship_timing.txt",
+          "sources": [
+            "thread_first_year_regret.txt",
+            "thread_internship_timing.txt",
+            "thread_late_work.txt"
+          ],
+          "n_sources": 3,
+          "best_distance": 0.2386,
+          "prompt_tokens": 446,
+          "output_tokens": 28,
+          "cache_hit": false,
+          "duration_ms": 638.65,
+          "question_length": 101,
+          "error_type": null,
+          "ts": "2026-11-16T04:06:15.493527+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:06:19.164026+00:00",
+          "request_id": "efa6ae47-0829-41d7-aad9-c5a5503d0d7c",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "What time is the best to do laundry in the dorms?",
+          "answer": "Tuesday and Wednesday mornings are the best times to do laundry in every building. \n\nSource: thread_laundry_timing.txt",
+          "sources": [
+            "thread_commuting.txt",
+            "thread_laundry_timing.txt",
+            "thread_roommate_conflict.txt"
+          ],
+          "n_sources": 3,
+          "best_distance": 0.2749,
+          "prompt_tokens": 428,
+          "output_tokens": 27,
+          "cache_hit": false,
+          "duration_ms": 661.77,
+          "question_length": 49,
+          "error_type": null,
+          "ts": "2026-11-16T04:06:19.164087+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:06:22.925400+00:00",
+          "request_id": "101f20ed-5b17-488b-bc35-b8d4a84e3f91",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "How long do I have to change my meal plan?",
+          "answer": "You can only change your meal plan in the first ten days (from `thread_meal_plan_tier.txt`).",
+          "sources": [
+            "thread_first_year_regret.txt",
+            "thread_meal_plan_tier.txt"
+          ],
+          "n_sources": 2,
+          "best_distance": 0.2404,
+          "prompt_tokens": 444,
+          "output_tokens": 25,
+          "cache_hit": false,
+          "duration_ms": 751.17,
+          "question_length": 42,
+          "error_type": null,
+          "ts": "2026-11-16T04:06:22.925465+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:06:26.505914+00:00",
+          "request_id": "65414395-b391-4a50-bb21-f31074d424f6",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+          "answer": "It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).",
+          "sources": [
+            "thread_bike_commute.txt",
+            "thread_commuting.txt",
+            "thread_laundry_timing.txt",
+            "thread_study_spots.txt"
+          ],
+          "n_sources": 4,
+          "best_distance": 0.2786,
+          "prompt_tokens": 460,
+          "output_tokens": 23,
+          "cache_hit": false,
+          "duration_ms": 574.26,
+          "question_length": 73,
+          "error_type": null,
+          "ts": "2026-11-16T04:06:26.505949+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:06:30.200275+00:00",
+          "request_id": "4f7e7271-00f6-43af-8e94-e5cd08d4c19a",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "What is the memory size or RAM recommended for a CS courses?",
+          "answer": "Based on the documents, 16GB of RAM is recommended for CS courses. \n\nSource: thread_laptop_specs.txt",
+          "sources": [
+            "thread_first_year_regret.txt",
+            "thread_laptop_specs.txt",
+            "thread_pass_fail.txt"
+          ],
+          "n_sources": 3,
+          "best_distance": 0.243,
+          "prompt_tokens": 459,
+          "output_tokens": 28,
+          "cache_hit": false,
+          "duration_ms": 685.66,
+          "question_length": 60,
+          "error_type": null,
+          "ts": "2026-11-16T04:06:30.200330+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:06:33.966061+00:00",
+          "request_id": "e28115c2-954f-46cd-9c3b-f0b0ae390298",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "When is the closing date or the latest time a student can apply for an internship at large employers?",
+          "answer": "Large employers close their internship applications in October and November for the following summer. \n\nSource: thread_internship_timing.txt",
+          "sources": [
+            "thread_first_year_regret.txt",
+            "thread_internship_timing.txt",
+            "thread_late_work.txt"
+          ],
+          "n_sources": 3,
+          "best_distance": 0.2386,
+          "prompt_tokens": 446,
+          "output_tokens": 27,
+          "cache_hit": false,
+          "duration_ms": 760.6,
+          "question_length": 101,
+          "error_type": null,
+          "ts": "2026-11-16T04:06:33.966117+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:06:38.037836+00:00",
+          "request_id": "630af298-0efa-4d7d-b39d-35f35cc750d3",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "What time is the best to do laundry in the dorms?",
+          "answer": "Tuesday and Wednesday mornings are the best times to do laundry in every building. \n\nSource: thread_laundry_timing.txt",
+          "sources": [
+            "thread_commuting.txt",
+            "thread_laundry_timing.txt",
+            "thread_roommate_conflict.txt"
+          ],
+          "n_sources": 3,
+          "best_distance": 0.2749,
+          "prompt_tokens": 428,
+          "output_tokens": 27,
+          "cache_hit": false,
+          "duration_ms": 1061.12,
+          "question_length": 49,
+          "error_type": null,
+          "ts": "2026-11-16T04:06:38.037899+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:06:41.921028+00:00",
+          "request_id": "9afbfe0f-adc6-4395-9ea1-b3748fad6b53",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "How long do I have to change my meal plan?",
+          "answer": "You can only change your meal plan in the first ten days (from `thread_meal_plan_tier.txt`).",
+          "sources": [
+            "thread_first_year_regret.txt",
+            "thread_meal_plan_tier.txt"
+          ],
+          "n_sources": 2,
+          "best_distance": 0.2404,
+          "prompt_tokens": 444,
+          "output_tokens": 25,
+          "cache_hit": false,
+          "duration_ms": 872.12,
+          "question_length": 42,
+          "error_type": null,
+          "ts": "2026-11-16T04:06:41.921091+00:00"
+        }
+      ]
+    },
+    "2": {
+      "criterion": 2,
+      "met": true,
+      "average_ms": 822.4,
+      "durations_ms": [
+        659.12,
+        867.64,
+        1151.94,
+        672.43,
+        1067.55,
+        649.48,
+        918.06,
+        432.19,
+        896.01,
+        909.84
+      ],
+      "min_ms": 432.19,
+      "max_ms": 1151.94,
+      "warmup": {
+        "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+        "status": 200,
+        "duration_ms": 725.43
+      },
+      "problems": [],
+      "responses": [
+        {
+          "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+          "status": 200,
+          "body": {
+            "answer": "It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).",
+            "best_distance": 0.2786,
+            "corpus": "advice_threads",
+            "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+            "refused": false,
+            "sources": [
+              "thread_bike_commute.txt",
+              "thread_commuting.txt",
+              "thread_laundry_timing.txt",
+              "thread_study_spots.txt"
+            ],
+            "threshold": 0.6
+          }
+        },
+        {
+          "question": "What is the memory size or RAM recommended for a CS courses?",
+          "status": 200,
+          "body": {
+            "answer": "Based on the documents provided, 16GB of RAM is recommended for CS courses. \n\nSource: `thread_laptop_specs.txt`",
+            "best_distance": 0.243,
+            "corpus": "advice_threads",
+            "question": "What is the memory size or RAM recommended for a CS courses?",
+            "refused": false,
+            "sources": [
+              "thread_first_year_regret.txt",
+              "thread_laptop_specs.txt",
+              "thread_pass_fail.txt"
+            ],
+            "threshold": 0.6
+          }
+        },
+        {
+          "question": "When is the closing date or the latest time a student can apply for an internship at large employers?",
+          "status": 200,
+          "body": {
+            "answer": "Large employers close applications in October and November for the following summer. \n\nSource: `thread_internship_timing.txt`",
+            "best_distance": 0.2386,
+            "corpus": "advice_threads",
+            "question": "When is the closing date or the latest time a student can apply for an internship at large employers?",
+            "refused": false,
+            "sources": [
+              "thread_first_year_regret.txt",
+              "thread_internship_timing.txt",
+              "thread_late_work.txt"
+            ],
+            "threshold": 0.6
+          }
+        },
+        {
+          "question": "What time is the best to do laundry in the dorms?",
+          "status": 200,
+          "body": {
+            "answer": "Tuesday and Wednesday mornings are the best times to do laundry in the dorms, as it is actually free then in every building. (Source: thread_laundry_timing.txt)",
+            "best_distance": 0.2749,
+            "corpus": "advice_threads",
+            "question": "What time is the best to do laundry in the dorms?",
+            "refused": false,
+            "sources": [
+              "thread_commuting.txt",
+              "thread_laundry_timing.txt",
+              "thread_roommate_conflict.txt"
+            ],
+            "threshold": 0.6
+          }
+        },
+        {
+          "question": "How long do I have to change my meal plan?",
+          "status": 200,
+          "body": {
+            "answer": "You can only change your meal plan in the first ten days (thread_meal_plan_tier.txt).",
+            "best_distance": 0.2404,
+            "corpus": "advice_threads",
+            "question": "How long do I have to change my meal plan?",
+            "refused": false,
+            "sources": [
+              "thread_first_year_regret.txt",
+              "thread_meal_plan_tier.txt"
+            ],
+            "threshold": 0.6
+          }
+        },
+        {
+          "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+          "status": 200,
+          "body": {
+            "answer": "It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).",
+            "best_distance": 0.2786,
+            "corpus": "advice_threads",
+            "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+            "refused": false,
+            "sources": [
+              "thread_bike_commute.txt",
+              "thread_commuting.txt",
+              "thread_laundry_timing.txt",
+              "thread_study_spots.txt"
+            ],
+            "threshold": 0.6
+          }
+        },
+        {
+          "question": "What is the memory size or RAM recommended for a CS courses?",
+          "status": 200,
+          "body": {
+            "answer": "Based on the provided documents, 16GB of RAM is recommended for CS courses. \n\nSource: `thread_laptop_specs.txt`",
+            "best_distance": 0.243,
+            "corpus": "advice_threads",
+            "question": "What is the memory size or RAM recommended for a CS courses?",
+            "refused": false,
+            "sources": [
+              "thread_first_year_regret.txt",
+              "thread_laptop_specs.txt",
+              "thread_pass_fail.txt"
+            ],
+            "threshold": 0.6
+          }
+        },
+        {
+          "question": "When is the closing date or the latest time a student can apply for an internship at large employers?",
+          "status": 200,
+          "body": {
+            "answer": "Large employers close applications in October and November for the following summer. \n\nSource: thread_internship_timing.txt",
+            "best_distance": 0.2386,
+            "corpus": "advice_threads",
+            "question": "When is the closing date or the latest time a student can apply for an internship at large employers?",
+            "refused": false,
+            "sources": [
+              "thread_first_year_regret.txt",
+              "thread_internship_timing.txt",
+              "thread_late_work.txt"
+            ],
+            "threshold": 0.6
+          }
+        },
+        {
+          "question": "What time is the best to do laundry in the dorms?",
+          "status": 200,
+          "body": {
+            "answer": "Tuesday and Wednesday mornings are the best times to do laundry in every building. \n\nSource: thread_laundry_timing.txt",
+            "best_distance": 0.2749,
+            "corpus": "advice_threads",
+            "question": "What time is the best to do laundry in the dorms?",
+            "refused": false,
+            "sources": [
+              "thread_commuting.txt",
+              "thread_laundry_timing.txt",
+              "thread_roommate_conflict.txt"
+            ],
+            "threshold": 0.6
+          }
+        },
+        {
+          "question": "How long do I have to change my meal plan?",
+          "status": 200,
+          "body": {
+            "answer": "You can only change your meal plan in the first ten days (from `thread_meal_plan_tier.txt`).",
+            "best_distance": 0.2404,
+            "corpus": "advice_threads",
+            "question": "How long do I have to change my meal plan?",
+            "refused": false,
+            "sources": [
+              "thread_first_year_regret.txt",
+              "thread_meal_plan_tier.txt"
+            ],
+            "threshold": 0.6
+          }
+        }
+      ],
+      "log_records": [
+        {
+          "timestamp": "2026-11-16T04:05:26.209123+00:00",
+          "request_id": "7fcbfc1b-fe34-4ab4-8bbf-99169eebc366",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+          "answer": "It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).",
+          "sources": [
+            "thread_bike_commute.txt",
+            "thread_commuting.txt",
+            "thread_laundry_timing.txt",
+            "thread_study_spots.txt"
+          ],
+          "n_sources": 4,
+          "best_distance": 0.2786,
+          "prompt_tokens": 460,
+          "output_tokens": 23,
+          "cache_hit": false,
+          "duration_ms": 725.43,
+          "question_length": 73,
+          "error_type": null,
+          "ts": "2026-11-16T04:05:26.209152+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:05:29.878312+00:00",
+          "request_id": "4e6b2d04-708b-43e8-994a-80ba6cd63428",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+          "answer": "It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).",
+          "sources": [
+            "thread_bike_commute.txt",
+            "thread_commuting.txt",
+            "thread_laundry_timing.txt",
+            "thread_study_spots.txt"
+          ],
+          "n_sources": 4,
+          "best_distance": 0.2786,
+          "prompt_tokens": 460,
+          "output_tokens": 23,
+          "cache_hit": false,
+          "duration_ms": 659.12,
+          "question_length": 73,
+          "error_type": null,
+          "ts": "2026-11-16T04:05:29.878345+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:05:33.754164+00:00",
+          "request_id": "2cf47649-608f-4107-83cd-ee139c1305fc",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "What is the memory size or RAM recommended for a CS courses?",
+          "answer": "Based on the documents provided, 16GB of RAM is recommended for CS courses. \n\nSource: `thread_laptop_specs.txt`",
+          "sources": [
+            "thread_first_year_regret.txt",
+            "thread_laptop_specs.txt",
+            "thread_pass_fail.txt"
+          ],
+          "n_sources": 3,
+          "best_distance": 0.243,
+          "prompt_tokens": 459,
+          "output_tokens": 31,
+          "cache_hit": false,
+          "duration_ms": 867.64,
+          "question_length": 60,
+          "error_type": null,
+          "ts": "2026-11-16T04:05:33.754231+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:05:37.917487+00:00",
+          "request_id": "820a47a7-72bc-4c4b-886f-8cf2e47fcad6",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "When is the closing date or the latest time a student can apply for an internship at large employers?",
+          "answer": "Large employers close applications in October and November for the following summer. \n\nSource: `thread_internship_timing.txt`",
+          "sources": [
+            "thread_first_year_regret.txt",
+            "thread_internship_timing.txt",
+            "thread_late_work.txt"
+          ],
+          "n_sources": 3,
+          "best_distance": 0.2386,
+          "prompt_tokens": 446,
+          "output_tokens": 27,
+          "cache_hit": false,
+          "duration_ms": 1151.94,
+          "question_length": 101,
+          "error_type": null,
+          "ts": "2026-11-16T04:05:37.917553+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:05:41.600631+00:00",
+          "request_id": "d3b48c5b-eb51-4f50-9cc7-265939974d71",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "What time is the best to do laundry in the dorms?",
+          "answer": "Tuesday and Wednesday mornings are the best times to do laundry in the dorms, as it is actually free then in every building. (Source: thread_laundry_timing.txt)",
+          "sources": [
+            "thread_commuting.txt",
+            "thread_laundry_timing.txt",
+            "thread_roommate_conflict.txt"
+          ],
+          "n_sources": 3,
+          "best_distance": 0.2749,
+          "prompt_tokens": 428,
+          "output_tokens": 38,
+          "cache_hit": false,
+          "duration_ms": 672.43,
+          "question_length": 49,
+          "error_type": null,
+          "ts": "2026-11-16T04:05:41.600660+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:05:45.676995+00:00",
+          "request_id": "242daa5a-46d6-417e-8dbb-b7afb86e0ba6",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "How long do I have to change my meal plan?",
+          "answer": "You can only change your meal plan in the first ten days (thread_meal_plan_tier.txt).",
+          "sources": [
+            "thread_first_year_regret.txt",
+            "thread_meal_plan_tier.txt"
+          ],
+          "n_sources": 2,
+          "best_distance": 0.2404,
+          "prompt_tokens": 444,
+          "output_tokens": 23,
+          "cache_hit": false,
+          "duration_ms": 1067.55,
+          "question_length": 42,
+          "error_type": null,
+          "ts": "2026-11-16T04:05:45.677062+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:05:49.334833+00:00",
+          "request_id": "68431fae-fdcc-41d4-95d4-8bafa18c7717",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+          "answer": "It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).",
+          "sources": [
+            "thread_bike_commute.txt",
+            "thread_commuting.txt",
+            "thread_laundry_timing.txt",
+            "thread_study_spots.txt"
+          ],
+          "n_sources": 4,
+          "best_distance": 0.2786,
+          "prompt_tokens": 460,
+          "output_tokens": 23,
+          "cache_hit": false,
+          "duration_ms": 649.48,
+          "question_length": 73,
+          "error_type": null,
+          "ts": "2026-11-16T04:05:49.334897+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:05:53.264214+00:00",
+          "request_id": "b7ad06da-96fd-4ef5-b5df-ec7a6fb405eb",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "What is the memory size or RAM recommended for a CS courses?",
+          "answer": "Based on the provided documents, 16GB of RAM is recommended for CS courses. \n\nSource: `thread_laptop_specs.txt`",
+          "sources": [
+            "thread_first_year_regret.txt",
+            "thread_laptop_specs.txt",
+            "thread_pass_fail.txt"
+          ],
+          "n_sources": 3,
+          "best_distance": 0.243,
+          "prompt_tokens": 459,
+          "output_tokens": 31,
+          "cache_hit": false,
+          "duration_ms": 918.06,
+          "question_length": 60,
+          "error_type": null,
+          "ts": "2026-11-16T04:05:53.264277+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:05:56.706969+00:00",
+          "request_id": "0141ce95-8874-4489-84bf-5f246c5e99a0",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "When is the closing date or the latest time a student can apply for an internship at large employers?",
+          "answer": "Large employers close applications in October and November for the following summer. \n\nSource: thread_internship_timing.txt",
+          "sources": [
+            "thread_first_year_regret.txt",
+            "thread_internship_timing.txt",
+            "thread_late_work.txt"
+          ],
+          "n_sources": 3,
+          "best_distance": 0.2386,
+          "prompt_tokens": 446,
+          "output_tokens": 25,
+          "cache_hit": false,
+          "duration_ms": 432.19,
+          "question_length": 101,
+          "error_type": null,
+          "ts": "2026-11-16T04:05:56.707012+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:06:00.610715+00:00",
+          "request_id": "92f89d64-f578-45f7-a59a-ce0431dd8815",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "What time is the best to do laundry in the dorms?",
+          "answer": "Tuesday and Wednesday mornings are the best times to do laundry in every building. \n\nSource: thread_laundry_timing.txt",
+          "sources": [
+            "thread_commuting.txt",
+            "thread_laundry_timing.txt",
+            "thread_roommate_conflict.txt"
+          ],
+          "n_sources": 3,
+          "best_distance": 0.2749,
+          "prompt_tokens": 428,
+          "output_tokens": 27,
+          "cache_hit": false,
+          "duration_ms": 896.01,
+          "question_length": 49,
+          "error_type": null,
+          "ts": "2026-11-16T04:06:00.610777+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:06:04.531451+00:00",
+          "request_id": "7d01824f-8f07-4f74-88a0-3f5703e63efc",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 200,
+          "outcome": "answered",
+          "question": "How long do I have to change my meal plan?",
+          "answer": "You can only change your meal plan in the first ten days (from `thread_meal_plan_tier.txt`).",
+          "sources": [
+            "thread_first_year_regret.txt",
+            "thread_meal_plan_tier.txt"
+          ],
+          "n_sources": 2,
+          "best_distance": 0.2404,
+          "prompt_tokens": 444,
+          "output_tokens": 25,
+          "cache_hit": false,
+          "duration_ms": 909.84,
+          "question_length": 42,
+          "error_type": null,
+          "ts": "2026-11-16T04:06:04.531514+00:00"
+        }
+      ]
+    },
+    "3": {
+      "criterion": 3,
+      "met": true,
+      "passing_scenarios": 6,
+      "of": 6,
+      "problems": [],
+      "invalid_requests": [
+        {
+          "name": "Empty JSON object",
+          "status": 400,
+          "logged_status": 400,
+          "logged_outcome": "bad_request",
+          "request_id": "dec6ff11-5894-460e-9b90-656af0f80a10",
+          "pass": true
+        },
+        {
+          "name": "Empty question",
+          "status": 400,
+          "logged_status": 400,
+          "logged_outcome": "bad_request",
+          "request_id": "6a781a9f-9403-46c5-be7c-e5603e4a901b",
+          "pass": true
+        },
+        {
+          "name": "Whitespace-only question",
+          "status": 400,
+          "logged_status": 400,
+          "logged_outcome": "bad_request",
+          "request_id": "849f1ce9-5f3b-4afa-aae2-2520d6dfe2d4",
+          "pass": true
+        },
+        {
+          "name": "Null question",
+          "status": 400,
+          "logged_status": 400,
+          "logged_outcome": "bad_request",
+          "request_id": "40ca384d-53c0-4a97-a4fb-f251d8281a5e",
+          "pass": true
+        },
+        {
+          "name": "JSON array",
+          "status": 400,
+          "logged_status": 400,
+          "logged_outcome": "bad_request",
+          "request_id": "cf580a4f-9c00-4169-a76c-67155a23c18f",
+          "pass": true
+        }
+      ],
+      "simulated_500": {
+        "status": 500,
+        "log_request_calls": 1,
+        "record": {
+          "timestamp": "2026-11-16T04:06:42.031913+00:00",
+          "request_id": "cc427a21-56cd-49d7-a44a-0b3915a372da",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 500,
+          "outcome": "error",
+          "question": "What is the application deadline?",
+          "answer": null,
+          "sources": null,
+          "n_sources": null,
+          "best_distance": null,
+          "prompt_tokens": 0,
+          "output_tokens": 0,
+          "cache_hit": false,
+          "duration_ms": 0.14,
+          "question_length": 33,
+          "error_type": "RuntimeError"
+        },
+        "pass": true
+      },
+      "responses": [
+        {
+          "name": "Empty JSON object",
+          "body": {},
+          "status": 400,
+          "response": {
+            "error": "Send JSON with a question in it, like {\"question\": \"is the housing lottery random?\"}"
+          }
+        },
+        {
+          "name": "Empty question",
+          "body": {
+            "question": ""
+          },
+          "status": 400,
+          "response": {
+            "error": "Send JSON with a question in it, like {\"question\": \"is the housing lottery random?\"}"
+          }
+        },
+        {
+          "name": "Whitespace-only question",
+          "body": {
+            "question": "   "
+          },
+          "status": 400,
+          "response": {
+            "error": "Send JSON with a question in it, like {\"question\": \"is the housing lottery random?\"}"
+          }
+        },
+        {
+          "name": "Null question",
+          "body": {
+            "question": null
+          },
+          "status": 400,
+          "response": {
+            "error": "Send JSON with a question in it, like {\"question\": \"is the housing lottery random?\"}"
+          }
+        },
+        {
+          "name": "JSON array",
+          "body": [],
+          "status": 400,
+          "response": {
+            "error": "Send JSON with a question in it, like {\"question\": \"is the housing lottery random?\"}"
+          }
+        }
+      ],
+      "log_records": [
+        {
+          "timestamp": "2026-11-16T04:06:41.928650+00:00",
+          "request_id": "dec6ff11-5894-460e-9b90-656af0f80a10",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 400,
+          "outcome": "bad_request",
+          "question": null,
+          "answer": null,
+          "sources": null,
+          "n_sources": null,
+          "best_distance": null,
+          "prompt_tokens": null,
+          "output_tokens": null,
+          "cache_hit": null,
+          "duration_ms": 0.3,
+          "question_length": 0,
+          "error_type": null,
+          "ts": "2026-11-16T04:06:41.928703+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:06:41.932365+00:00",
+          "request_id": "6a781a9f-9403-46c5-be7c-e5603e4a901b",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 400,
+          "outcome": "bad_request",
+          "question": null,
+          "answer": null,
+          "sources": null,
+          "n_sources": null,
+          "best_distance": null,
+          "prompt_tokens": null,
+          "output_tokens": null,
+          "cache_hit": null,
+          "duration_ms": 0.19,
+          "question_length": 0,
+          "error_type": null,
+          "ts": "2026-11-16T04:06:41.932408+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:06:41.935176+00:00",
+          "request_id": "849f1ce9-5f3b-4afa-aae2-2520d6dfe2d4",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 400,
+          "outcome": "bad_request",
+          "question": null,
+          "answer": null,
+          "sources": null,
+          "n_sources": null,
+          "best_distance": null,
+          "prompt_tokens": null,
+          "output_tokens": null,
+          "cache_hit": null,
+          "duration_ms": 0.12,
+          "question_length": 0,
+          "error_type": null,
+          "ts": "2026-11-16T04:06:41.935206+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:06:41.937780+00:00",
+          "request_id": "40ca384d-53c0-4a97-a4fb-f251d8281a5e",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 400,
+          "outcome": "bad_request",
+          "question": null,
+          "answer": null,
+          "sources": null,
+          "n_sources": null,
+          "best_distance": null,
+          "prompt_tokens": null,
+          "output_tokens": null,
+          "cache_hit": null,
+          "duration_ms": 0.17,
+          "question_length": 0,
+          "error_type": null,
+          "ts": "2026-11-16T04:06:41.937808+00:00"
+        },
+        {
+          "timestamp": "2026-11-16T04:06:41.939763+00:00",
+          "request_id": "cf580a4f-9c00-4169-a76c-67155a23c18f",
+          "method": "POST",
+          "path": "/ask",
+          "http_status": 400,
+          "outcome": "bad_request",
+          "question": null,
+          "answer": null,
+          "sources": null,
+          "n_sources": null,
+          "best_distance": null,
+          "prompt_tokens": null,
+          "output_tokens": null,
+          "cache_hit": null,
+          "duration_ms": 0.12,
+          "question_length": 0,
+          "error_type": null,
+          "ts": "2026-11-16T04:06:41.939786+00:00"
+        }
+      ]
+    },
+    "5": {
+      "criterion": 5,
+      "met": true,
+      "passing": 8,
+      "of": 8,
+      "rows": [
+        {
+          "kind": "in_scope",
+          "question": "How much does it cost to rent a locker in the commuter lounge for a year?",
+          "expects": "$20",
+          "status": 200,
+          "refused": false,
+          "answer": "It costs $20 a year to rent a locker in the commuter lounge (from thread_commuting.txt).",
+          "judge": true,
+          "report": {
+            "refused": false,
+            "answer_correct": true,
+            "retrieval_hit": true,
+            "names_source": true,
+            "cited_source_supports": true
+          },
+          "pass": true
+        },
+        {
+          "kind": "in_scope",
+          "question": "What is the memory size or RAM recommended for a CS courses?",
+          "expects": "16GB",
+          "status": 200,
+          "refused": false,
+          "answer": "Based on the provided documents, 16GB of RAM is recommended for CS courses (or worth paying for), as an 8GB machine can struggle by the last project. \n\nSource: thread_laptop_specs.txt",
+          "judge": true,
+          "report": {
+            "refused": false,
+            "answer_correct": true,
+            "retrieval_hit": true,
+            "names_source": true,
+            "cited_source_supports": true
+          },
+          "pass": true
+        },
+        {
+          "kind": "in_scope",
+          "question": "When is the closing date or the latest time a student can apply for an internship at large employers?",
+          "expects": "October and November",
+          "status": 200,
+          "refused": false,
+          "answer": "Large employers close applications in October and November for the following summer. \n\nSource: thread_internship_timing.txt",
+          "judge": true,
+          "report": {
+            "refused": false,
+            "answer_correct": true,
+            "retrieval_hit": true,
+            "names_source": true,
+            "cited_source_supports": true
+          },
+          "pass": true
+        },
+        {
+          "kind": "in_scope",
+          "question": "What time is the best to do laundry in the dorms?",
+          "expects": "Tuesday and Wednesday mornings",
+          "status": 200,
+          "refused": false,
+          "answer": "Tuesday and Wednesday mornings are the best times to do laundry in every building. \n\nSource: thread_laundry_timing.txt",
+          "judge": true,
+          "report": {
+            "refused": false,
+            "answer_correct": true,
+            "retrieval_hit": true,
+            "names_source": true,
+            "cited_source_supports": true
+          },
+          "pass": true
+        },
+        {
+          "kind": "in_scope",
+          "question": "How long do I have to change my meal plan?",
+          "expects": "first ten days",
+          "status": 200,
+          "refused": false,
+          "answer": "You can only change your meal plan in the first ten days (from thread_meal_plan_tier.txt).",
+          "judge": true,
+          "report": {
+            "refused": false,
+            "answer_correct": true,
+            "retrieval_hit": true,
+            "names_source": true,
+            "cited_source_supports": true
+          },
+          "pass": true
+        },
+        {
+          "kind": "out_of_scope",
+          "question": "What is the capital of Mongolia?",
+          "status": 200,
+          "refused": true,
+          "best_distance": 0.8935,
+          "answer": "I don't have enough information about that.",
+          "pass": true
+        },
+        {
+          "kind": "out_of_scope",
+          "question": "How do I change the oil in a diesel engine?",
+          "status": 200,
+          "refused": true,
+          "best_distance": 0.8964,
+          "answer": "I don't have enough information about that.",
+          "pass": true
+        },
+        {
+          "kind": "out_of_scope",
+          "question": "Who won the 1994 World Cup?",
+          "status": 200,
+          "refused": true,
+          "best_distance": 0.8934,
+          "answer": "I don't have enough information about that.",
+          "pass": true
+        }
+      ]
+    }
+  }
+}
