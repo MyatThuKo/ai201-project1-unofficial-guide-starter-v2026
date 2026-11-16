@@ -28,12 +28,66 @@ this file stays the bare shell until then.
 """
 
 import os
+import time
+import uuid
+from datetime import datetime, timezone
 
-from flask import Flask, jsonify, request
+from flask import Flask, g, jsonify, request
+
+from request_log import log_request
 
 import config
 
 app = Flask(__name__)
+
+
+@app.before_request
+def start_request():
+    g.started_at = time.perf_counter()
+    g.request_id = str(uuid.uuid4())
+
+
+@app.after_request
+def record_request(response):
+    duration_ms = (
+        time.perf_counter() - g.started_at
+    ) * 1000
+
+    status = response.status_code
+
+    if status >= 500:
+        outcome = "error"
+    elif status >= 400:
+        outcome = "bad_request"
+    elif request.path == "/ask":
+        outcome = (
+            "refused"
+            if getattr(g, "refused", False)
+            else "answered"
+        )
+    else:
+        outcome = "completed"
+
+    record = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "request_id": g.request_id,
+        "method": request.method,
+        "path": request.path,
+        "http_status": status,
+        "outcome": outcome,
+        "n_sources": getattr(g, "n_sources", None),
+        "best_distance": getattr(g, "best_distance", None),
+        "duration_ms": round(duration_ms, 2),
+        "question_length": getattr(
+            g, "question_length", None
+        ),
+        "error_type": getattr(
+            g, "error_type", None
+        ),
+    }
+
+    log_request(record)
+    return response
 
 
 @app.get("/health")
@@ -74,7 +128,11 @@ def ask():
     from app import ask_pipeline
 
     payload = request.get_json(silent=True) or {}
-    question = (payload.get("question") or "").strip()
+
+    if not isinstance(payload, dict):
+        payload = {}
+    question = str(payload.get("question") or "").strip()
+    g.question_length = len(question)
 
     if not question:
         return (
@@ -90,7 +148,12 @@ def ask():
     try:
         outcome = ask_pipeline(question, corpus=config.CORPUS)
     except Exception as exc:  # noqa: BLE001 — a reader gets this, not a traceback
+        g.error_type = type(exc).__name__
         return jsonify({"error": f"{type(exc).__name__}: {exc}"}), 500
+
+    g.refused = outcome["refused"]
+    g.n_sources = len(outcome["sources"])
+    g.best_distance = round(outcome["best_distance"], 4)
 
     return jsonify(
         {
