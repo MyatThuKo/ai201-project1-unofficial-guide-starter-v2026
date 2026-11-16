@@ -217,8 +217,8 @@ gunicorn serve:app                 # the way a host starts it
 > the first request after a quiet spell waits roughly a minute for it to wake
 > up. That's the tier, not your code.
 
-`serve.py` has **no logging and no timing in it on purpose** — building that is
-the unit 9 exercise, and it is easier to instrument something you wrote.
+`serve.py` now writes a structured log record for every request — see
+**Running The Unofficial Guide (Capstone)** at the bottom of this file.
 
 ---
 
@@ -255,3 +255,120 @@ units.
 
 `results/` is deliberately **not** in `.gitignore`. Your run logs are evidence
 that the test actually happened, and they're part of what gets graded.
+
+# Running The Unofficial Guide (Capstone)
+
+## Run path
+
+**Path B — local with logs.** The system runs on your machine as a Flask HTTP
+service (`serve.py`). Every request to it writes one structured JSON record to
+`logs/requests.jsonl`.
+
+## What the environment needs
+
+| Thing | Requirement |
+|---|---|
+| Python | 3.11, 3.12 or 3.13 (tested on **3.13.15**). Not 3.14 — several dependencies don't support it yet |
+| Dependencies | `requirements.txt` — every package pinned with lower and upper bounds |
+| API key | A Gemini API key in `.env` as `GEMINI_API_KEY` (free at https://aistudio.google.com) |
+| Model files | Chroma's ONNX build of **all-MiniLM-L6-v2**, downloaded automatically the first time you build the index into `~/.cache/chroma` (**166 MB** on disk) |
+| Corpus | `advice_threads` (ships in `corpora/`) |
+| Disk | About 380 MB for `.venv`, plus the model cache above |
+
+`.env` and `chroma_db/` are both in `.gitignore`, so **a fresh clone has neither
+a key nor an index**. Steps 3 and 4 below create them.
+
+## From a clean checkout
+
+```bash
+# 1. Get the code
+git clone <repository-url> unofficial-guide
+cd unofficial-guide
+
+# 2. Create the environment and install the pinned dependencies
+python3.13 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+
+# 3. Add your key: copy the template, then paste your key into .env
+cp .env.example .env
+
+# 4. Build the index (first run also downloads the 166 MB embedding model)
+python app.py index
+```
+
+## Start the service — the single command
+
+```bash
+AI201_CACHE=0 python serve.py
+```
+
+It listens on **http://localhost:5001**.
+
+- **Why 5001, not 5000:** on macOS, AirPlay Receiver already listens on port
+  5000 and answers every request with an empty `403 Forbidden`, so requests
+  never reach Flask. Set `PORT=...` to use a different port.
+- **Why `AI201_CACHE=0`:** with the cache on, a repeated question is answered
+  from `.cache/` without calling Gemini, so its duration and token count are
+  not a real run. Leave the cache off whenever you're measuring.
+
+## Check it's working (second terminal)
+
+```bash
+source .venv/bin/activate
+
+curl http://localhost:5001/health          # expect "index_ready": true
+
+curl -X POST http://localhost:5001/ask \
+  -H "Content-Type: application/json" \
+  -d '{"question": "Is the housing lottery random?"}'
+```
+
+## Run a measured session
+
+```bash
+rm -f logs/requests.jsonl                  # start from an empty log
+python run_capstone_requests.py            # 12 questions + 2 bad requests
+python measure_cost.py                     # averages from the log
+cp logs/requests.jsonl results/capstone_m3_session.jsonl   # save as evidence
+```
+
+`logs/` is in `.gitignore`; the copy in `results/` is the committed run record.
+
+## The structured log
+
+`logs/requests.jsonl` — one JSON object per line, one line per request,
+written for every route and every outcome (including 400s and 500s).
+
+| Field | Meaning |
+|---|---|
+| `timestamp`, `ts` | When the request finished (UTC, ISO 8601) |
+| `request_id` | A UUID for this request |
+| `method`, `path`, `http_status` | The HTTP request and response status |
+| `outcome` | `answered`, `refused` (gate said no — still a 200), `bad_request` (400), `error` (500), or `completed` (`/health`) |
+| `question`, `question_length` | The input |
+| `answer` | The output, first 300 characters |
+| `sources`, `n_sources` | Documents the answer was grounded in |
+| `best_distance` | Closest retrieved chunk's distance — the number the gate compared to its threshold |
+| `prompt_tokens`, `output_tokens` | Gemini tokens this request used, from the API's own `usage_metadata` (0 for refusals and cache hits) |
+| `cache_hit` | `true` if the answer came from the local cache instead of Gemini |
+| `duration_ms` | Server-side time from request in to response out, via `time.perf_counter()` |
+| `error_type` | The exception class name on a 500, otherwise `null` |
+
+Read it with:
+
+```bash
+jq -c '{outcome, http_status, duration_ms, prompt_tokens, output_tokens, question}' logs/requests.jsonl
+```
+
+`duration_ms` does not include writing the log line or network time to the
+client. The **first** `/ask` after start-up is slower: it loads Chroma and the
+index.
+
+## Tests
+
+```bash
+python -m unittest test_capstone_logging.py -v
+```
+
+Checks the log record for every outcome without calling Gemini.

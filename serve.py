@@ -37,8 +37,12 @@ from flask import Flask, g, jsonify, request
 from request_log import log_request
 
 import config
+import generate
 
 app = Flask(__name__)
+
+# Answers are cut to this many characters in the log so each line stays readable.
+ANSWER_LOG_CHARS = 300
 
 
 @app.before_request
@@ -75,8 +79,14 @@ def record_request(response):
         "path": request.path,
         "http_status": status,
         "outcome": outcome,
+        "question": getattr(g, "question", None),
+        "answer": getattr(g, "answer", None),
+        "sources": getattr(g, "sources", None),
         "n_sources": getattr(g, "n_sources", None),
         "best_distance": getattr(g, "best_distance", None),
+        "prompt_tokens": getattr(g, "prompt_tokens", None),
+        "output_tokens": getattr(g, "output_tokens", None),
+        "cache_hit": getattr(g, "cache_hit", None),
         "duration_ms": round(duration_ms, 2),
         "question_length": getattr(
             g, "question_length", None
@@ -133,6 +143,7 @@ def ask():
         payload = {}
     question = str(payload.get("question") or "").strip()
     g.question_length = len(question)
+    g.question = question or None
 
     if not question:
         return (
@@ -145,13 +156,25 @@ def ask():
             400,
         )
 
+    # Token and cache counters in generate.py are running totals for the whole
+    # process, so the cost of THIS request is the difference across the call.
+    tokens_before = generate.token_counts()
+    cache_hits_before = generate._cache_hits
+
     try:
         outcome = ask_pipeline(question, corpus=config.CORPUS)
     except Exception as exc:  # noqa: BLE001 — a reader gets this, not a traceback
         g.error_type = type(exc).__name__
         return jsonify({"error": f"{type(exc).__name__}: {exc}"}), 500
+    finally:
+        tokens_after = generate.token_counts()
+        g.prompt_tokens = tokens_after["prompt"] - tokens_before["prompt"]
+        g.output_tokens = tokens_after["output"] - tokens_before["output"]
+        g.cache_hit = generate._cache_hits > cache_hits_before
 
     g.refused = outcome["refused"]
+    g.answer = (outcome["answer"] or "")[:ANSWER_LOG_CHARS]
+    g.sources = outcome["sources"]
     g.n_sources = len(outcome["sources"])
     g.best_distance = round(outcome["best_distance"], 4)
 
@@ -175,7 +198,9 @@ def main():
     # can't reach a socket that only accepts connections from inside the
     # container. It is the single most common way a first deploy "succeeds"
     # and is unreachable.
-    port = int(os.getenv("PORT", "5000"))
+    # Defaults to 5001, not 5000: on macOS the AirPlay Receiver already listens
+    # on 5000 and answers every request with an empty 403.
+    port = int(os.getenv("PORT", "5001"))
 
     # Debug mode reloads on save, which is handy, and prints a console that
     # runs arbitrary code, which is not something to leave switched on where

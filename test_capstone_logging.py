@@ -46,6 +46,13 @@ class RequestLoggingTests(unittest.TestCase):
         self.assertEqual(record["n_sources"], 2)
         self.assertEqual(record["best_distance"], 0.2346)
         self.assertIsNone(record["error_type"])
+        # input, output and cost fields
+        self.assertEqual(record["question"], question)
+        self.assertEqual(record["answer"], "Yes, according to the guide.")
+        self.assertEqual(record["sources"], ["housing.md", "lottery.md"])
+        self.assertEqual(record["prompt_tokens"], 0)  # pipeline is mocked: no Gemini call
+        self.assertEqual(record["output_tokens"], 0)
+        self.assertFalse(record["cache_hit"])
 
     @patch("serve.log_request")
     @patch("app.ask_pipeline")
