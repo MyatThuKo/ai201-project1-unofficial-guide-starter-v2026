@@ -561,6 +561,8 @@ All five automated acceptance criteria were MET across three trials.
 
 No missed automated criterion required diagnosis. However, the results exposed a limitation in the latency criterion.
 
+These are the verdicts **before** the improvement. After it, criterion 2 missed in trials 2 and 3; that miss is diagnosed under _Diagnosis of the Criterion 2 Miss_ below.
+
 **Assessment of the Targets**
 
 Criterion 2 measured average warm-request latency and excluded the first request after startup. Although all three trials met the 1,000 ms average target, the first request in Trial 1 took 2,766.31 ms.
@@ -572,6 +574,20 @@ The original average-based target therefore did not capture cold-start overhead 
 **Criterion I Would Tighten**
 
 I would tighten Criterion 2 in a future evaluation by including first-request latency after a fresh server start and setting a separate measurable target for it.
+
+The tightened targets:
+
+- **Warm requests:** every one of criterion 2's 10 measured warm requests ≤ **1,500 ms** (10 of 10), in each of three trials, instead of an average ≤ 1,000 ms.
+- **First request after a fresh start:** ≤ **1,000 ms** in **3 of 3** cold starts, measured with `measure_cold_start.py`.
+
+Scored against data I already have, the tighter targets would have given:
+
+| Tightened target                                          | Before the fix                       | After the fix                                        |
+| --------------------------------------------------------- | ------------------------------------ | ---------------------------------------------------- |
+| Every warm request ≤ 1,500 ms (criterion 2's 10 requests) | MET: slowest 949 / 1,018 / 957 ms    | **MISSED**: slowest 1,152 / **3,514** / **1,731** ms |
+| First request after a fresh start ≤ 1,000 ms, 3 of 3      | **MISSED**: 2,529 / 2,165 / 1,994 ms | **MISSED** (2 of 3): 569 / **1,010** / 651 ms        |
+
+Two honest notes on these results. First, the slowest warm requests in the before trials (4,266 ms and 3,953 ms) fell in criterion 1's requests, not criterion 2's, so even the per-request target would not have caught them; applying it to every warm `/ask` in a trial would. Second, the cold-start target would still miss after the fix, by 10 ms in one run. The fix removed the start-up cost, but what remains is the model's own response time, and a 1,000 ms limit leaves almost no room for it.
 
 The original `criteria.md` remains unchanged so the before-and-after results can be compared against the same standards.
 
