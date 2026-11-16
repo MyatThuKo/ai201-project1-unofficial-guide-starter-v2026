@@ -87,6 +87,8 @@ def record_request(response):
         "prompt_tokens": getattr(g, "prompt_tokens", None),
         "output_tokens": getattr(g, "output_tokens", None),
         "cache_hit": getattr(g, "cache_hit", None),
+        "retrieval_ms": getattr(g, "retrieval_ms", None),
+        "generation_ms": getattr(g, "generation_ms", None),
         "duration_ms": round(duration_ms, 2),
         "question_length": getattr(
             g, "question_length", None
@@ -161,16 +163,39 @@ def ask():
     tokens_before = generate.token_counts()
     cache_hits_before = generate._cache_hits
 
+    # Stretch: latency breakdown. ask_pipeline already calls on_gate right after
+    # retrieval + the relevance gate, and on_prompt right before the Gemini call,
+    # so timing between them splits the request into stages without changing
+    # retrieval, the gate or generation.
+    marks = {}
+    pipeline_start = time.perf_counter()
+
     try:
-        outcome = ask_pipeline(question, corpus=config.CORPUS)
+        outcome = ask_pipeline(
+            question,
+            corpus=config.CORPUS,
+            on_gate=lambda _decision: marks.setdefault("gate", time.perf_counter()),
+            on_prompt=lambda _prompt: marks.setdefault("prompt", time.perf_counter()),
+        )
     except Exception as exc:  # noqa: BLE001 — a reader gets this, not a traceback
         g.error_type = type(exc).__name__
         return jsonify({"error": f"{type(exc).__name__}: {exc}"}), 500
     finally:
+        pipeline_end = time.perf_counter()
         tokens_after = generate.token_counts()
         g.prompt_tokens = tokens_after["prompt"] - tokens_before["prompt"]
         g.output_tokens = tokens_after["output"] - tokens_before["output"]
         g.cache_hit = generate._cache_hits > cache_hits_before
+
+        # retrieval_ms: embed the question + Chroma search + relevance gate.
+        # generation_ms: the Gemini call (0 when the gate refused, since the
+        # model is never called). None means that stage was never reached.
+        if "gate" in marks:
+            g.retrieval_ms = round((marks["gate"] - pipeline_start) * 1000, 2)
+            if "prompt" in marks:
+                g.generation_ms = round((pipeline_end - marks["prompt"]) * 1000, 2)
+            elif "error_type" not in g:
+                g.generation_ms = 0.0
 
     g.refused = outcome["refused"]
     g.answer = (outcome["answer"] or "")[:ANSWER_LOG_CHARS]

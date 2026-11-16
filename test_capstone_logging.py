@@ -102,6 +102,41 @@ class RequestLoggingTests(unittest.TestCase):
         self.assertIsNone(record["n_sources"])
         self.assertIsNone(record["best_distance"])
 
+    @patch("serve.log_request")
+    @patch("app.ask_pipeline")
+    def test_latency_breakdown_is_logged(self, mock_pipeline, mock_log):
+        """Stretch: retrieval_ms and generation_ms come from the pipeline's callbacks."""
+        import time as _time
+
+        def fake_pipeline(question, corpus=None, on_gate=None, on_prompt=None, **_):
+            _time.sleep(0.02)          # "retrieval + gate"
+            on_gate(object())
+            on_prompt("prompt text")
+            _time.sleep(0.05)          # "generation"
+            return {"answer": "Yes (a.txt).", "refused": False, "sources": ["a.txt"],
+                    "best_distance": 0.3, "threshold": 0.6}
+
+        mock_pipeline.side_effect = fake_pipeline
+        self.client.post("/ask", json={"question": "Is it random?"})
+        record = mock_log.call_args.args[0]
+        self.assertGreaterEqual(record["retrieval_ms"], 15)
+        self.assertGreaterEqual(record["generation_ms"], 40)
+        self.assertLessEqual(record["retrieval_ms"] + record["generation_ms"], record["duration_ms"])
+
+    @patch("serve.log_request")
+    @patch("app.ask_pipeline")
+    def test_refusal_has_zero_generation_time(self, mock_pipeline, mock_log):
+        def fake_pipeline(question, corpus=None, on_gate=None, on_prompt=None, **_):
+            on_gate(object())          # gate refuses: on_prompt is never called
+            return {"answer": "I don't have enough information about that.", "refused": True,
+                    "sources": [], "best_distance": 0.9, "threshold": 0.6}
+
+        mock_pipeline.side_effect = fake_pipeline
+        self.client.post("/ask", json={"question": "Capital of Mongolia?"})
+        record = mock_log.call_args.args[0]
+        self.assertIsNotNone(record["retrieval_ms"])
+        self.assertEqual(record["generation_ms"], 0.0)
+
     def test_health_check_is_logged(self):
         fake_store = ModuleType("store")
         fake_store.index_exists = lambda corpus: True

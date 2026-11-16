@@ -386,6 +386,8 @@ written for every route and every outcome (including 400s and 500s).
 | `best_distance` | Closest retrieved chunk's distance — the number the gate compared to its threshold |
 | `prompt_tokens`, `output_tokens` | Gemini tokens this request used, from the API's own `usage_metadata` (0 for refusals and cache hits) |
 | `cache_hit` | `true` if the answer came from the local cache instead of Gemini |
+| `retrieval_ms` | Time for embedding the question, the Chroma search and the relevance gate |
+| `generation_ms` | Time for the Gemini call (`0` when the gate refused, `null` if never reached) |
 | `duration_ms` | Server-side time from request in to response out, via `time.perf_counter()` |
 | `error_type` | The exception class name on a 500, otherwise `null` |
 
@@ -425,6 +427,19 @@ python measure_cold_start.py --label after
 
 It writes `results/capstone_coldstart_<label>.json` with the start-up time and
 the first-request time for each fresh start.
+
+## Load observation (stretch)
+
+With the server running (`AI201_CACHE=0 python serve.py`), in a second terminal:
+
+```bash
+python measure_load.py --label baseline --interval 3.0
+python measure_load.py --label load --interval 0.3
+```
+
+Each run sends 40 requests on a fixed schedule and writes
+`results/capstone_load_<label>.json`. Per-request token counts are only reliable
+when requests don't overlap. The script reports how many did.
 
 ## Tests
 

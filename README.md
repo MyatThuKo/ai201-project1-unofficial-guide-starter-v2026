@@ -782,3 +782,50 @@ The first thing I'd do is split `duration_ms` into `retrieval_ms` and `generatio
 **3. Criteria.** I wrote the five capstone criteria myself. I asked Claude to review them without rewriting them: for each one, how it would test it from the wording alone, whether two people would score it the same, and what would make it fail. Over three rounds that review found ambiguities I then fixed, including no cache setting, request IDs the client never receives, and `judge()` needing retrieval results that `/ask` doesn't return. For the Milestone 6 tightened targets, Claude laid out options from my data and I chose the numbers.
 
 **4. Testing tools and the fix.** Claude wrote the test tooling (`run_trials.py`, `measure_cost.py`, `measure_cold_start.py`, `run_capstone_requests.py`) to follow my criteria as written. It timed each lazy start-up step, which became my Milestone 6 diagnosis, and it wrote `serve.py::warm_up()`. I ran every trial, every clean-clone test and every measurement myself. Claude checked the results and pointed out when a run was invalid: the first after-fix clones tested old code because I hadn't pushed.
+
+**Capstone Stretch**
+
+I'm adding two stretch items. Each is declared here and committed before any code for it is written.
+
+1. **A latency breakdown.** The request log will record where the time goes inside one `/ask`: `retrieval_ms` (embedding the question, the Chroma search and the relevance gate) and `generation_ms` (the Gemini call), alongside the existing total `duration_ms`. Both are measured with `time.perf_counter()` through `app.py::ask_pipeline`'s existing `on_gate` and `on_prompt` callbacks, so retrieval, the gate and generation themselves are not changed. I'll run a measured session, put the per-stage numbers in this README, and say which stage dominates. This is also the "one thing I'd do first" from _If I Had Another Unit_: it turns the criterion 2 diagnosis from an inference into a measurement.
+2. **A load observation.** I'll run the service at about 10× its normal rate: one request every ~0.3 s instead of every 3 s, the pacing my criteria use. I'll report what changed against the 3-second baseline in latency (total and per stage), error rate and tokens, including "nothing changed" if that's what the numbers show.
+
+**Stretch Results**
+
+Both items were built after the declaration above: `serve.py` (the `on_gate` / `on_prompt` timing in `ask()`, plus `retrieval_ms` and `generation_ms` in `record_request()`), two new tests in `test_capstone_logging.py` (7/7 pass), and `measure_load.py`. The server was restarted with `AI201_CACHE=0` and both sessions ran against it back to back. Each session sent 40 requests cycling the five in-scope questions from `questions.py`. The results are in `results/capstone_load_baseline.json` and `results/capstone_load_load.json`, produced by `measure_load.py::main()` from the new lines in `logs/requests.jsonl`.
+
+**1. Latency breakdown**
+
+Measured on the 38 answered requests of the baseline session (one request every 3 s, the pacing my criteria use):
+
+| Stage           | What it covers                                  | Avg      | Median   | p90        | Max        | Share of avg total |
+| --------------- | ----------------------------------------------- | -------- | -------- | ---------- | ---------- | ------------------ |
+| `retrieval_ms`  | embed question + Chroma search + relevance gate | 71.0 ms  | 72.7 ms  | 75.9 ms    | 93.6 ms    | ~8%                |
+| `generation_ms` | the Gemini call                                 | 835.0 ms | 668.8 ms | 1,560.1 ms | 2,332.7 ms | ~92%               |
+| `duration_ms`   | whole request                                   | 906.5 ms | 741.3 ms | 1,632.0 ms | 2,397.3 ms | 100%               |
+
+**Generation dominates:** about 92% of an answered request is the Gemini call. Retrieval is small and steady (71–94 ms); all of the variation is in generation (669 ms median, up to 2,333 ms). This turns the criterion 2 diagnosis from Milestone 6 from an inference into a measurement: the slow warm requests that missed the 1,000 ms average are slow in the generation stage, not in retrieval. A refusal never reaches Gemini and is logged with `generation_ms: 0`.
+
+**2. Load observation**
+
+Same server, same 40 questions, sent at ~10× the rate: one request every 0.3 s (~200/min) instead of every 3 s (~20/min). Requests are sent on a fixed schedule in separate threads, so at 0.3 s they overlap rather than waiting for each other.
+
+|                                                   | Baseline: every 3.0 s (~20/min)      | Load: every 0.3 s (~200/min)             | Change                        |
+| ------------------------------------------------- | ------------------------------------ | ---------------------------------------- | ----------------------------- |
+| Time to send and finish 40 requests               | 118.8 s                              | 33.2 s                                   |                               |
+| Answered / errored                                | 38 / 2                               | 24 / 16                                  |                               |
+| **Error rate**                                    | **5%**                               | **40%**                                  | ×8                            |
+| `duration_ms`, answered: avg / median / p90 / max | 906.5 / 741.3 / 1,632.0 / 2,397.3 ms | 2,414.4 / 1,801.7 / 6,084.2 / 7,352.9 ms | avg ×2.7                      |
+| `retrieval_ms` avg / max                          | 71.0 / 93.6 ms                       | 71.5 / 83.3 ms                           | unchanged                     |
+| `generation_ms` avg / max                         | 835.0 / 2,332.7 ms                   | 2,342.6 / 7,290.1 ms                     | avg ×2.8                      |
+| Requests overlapping another                      | 7 of 40                              | 40 of 40                                 |                               |
+| Logged tokens per answer, avg                     | 472.8                                | 2,187.2                                  | not a real change (see below) |
+
+What changed, and where:
+
+- **Latency rose only in generation.** Retrieval was the same under load (71.0 → 71.5 ms avg), while generation went from 835 to 2,343 ms on average and up to 7.3 s. All of the slowdown is waiting on Gemini.
+- **Errors came from the model provider's rate limit.** All 16 errors under load were the last 16 requests in order: the first 24 were answered, then every request failed. Each error is a `RuntimeError` after 20.6–23.2 s. That is `generate.py::generate` giving up after `config.MAX_RETRIES = 4` attempts, each refused by Gemini as rate-limited, with backoff waits of 1 + 2 + 4 + 8 = 15 s, plus queuing behind the other requests.
+- **The baseline was not error-free either.** Two consecutive errors at the normal pacing, 19th and 21st of 40, each took 15.6 s: the same four rate-limited attempts with 15 s of backoff. Sustained for two minutes, 20 requests/min was enough to hit the free-tier limit. My criteria trials ran at the same pacing but in shorter bursts, which is likely why they never hit it. This is a real risk the trials did not show.
+- **The instrumentation broke under concurrency.** Per-request tokens are computed as the change in `generate.py`'s process-wide token counters across the request. When requests overlap, each one's change includes its neighbours' tokens. Under load the logged tokens per answer jumped from 473 to 2,187 even though the prompts were identical, so the per-request token field is **not trustworthy when requests overlap**. The baseline's 7 overlaps all involve the two 15 s errors, so its 472.8 average matches the trials (474.4). The cost per answer did not really change; the measurement did.
+
+**What I'd change because of this:** count tokens from each response's own `usage_metadata` and pass it back with the answer, instead of subtracting process-wide totals, so the field stays correct under concurrency. And cap the request rate at the service, rejecting or queuing with a clear 429 of its own, below the model provider's limit, instead of letting requests spend 15–23 s in retries before failing.
